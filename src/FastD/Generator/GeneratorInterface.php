@@ -24,11 +24,9 @@ use FastD\Generator\Factory\Property;
 interface GeneratorInterface
 {
     /**
-     * GeneratorInterface constructor.
-     * @param $name
-     * @param null $namespace
+     * @return string
      */
-    public function __construct($name, $namespace = null);
+    public function getFile();
 
     /**
      * @return string
@@ -38,24 +36,7 @@ interface GeneratorInterface
     /**
      * @return string
      */
-    public function getFileName();
-
-    /**
-     * @return string
-     */
     public function getNamespace();
-
-    /**
-     * @param Property $property
-     * @return GeneratorInterface
-     */
-    public function setProperty(Property $property);
-
-    /**
-     * @param $name
-     * @return Property
-     */
-    public function getProperty($name);
 
     /**
      * @param array Property[] $properties
@@ -67,18 +48,6 @@ interface GeneratorInterface
      * @return Property[]
      */
     public function getProperties();
-
-    /**
-     * @param Method $method
-     * @return GeneratorInterface
-     */
-    public function setMethod(Method $method);
-
-    /**
-     * @param $name
-     * @return Method
-     */
-    public function getMethod($name);
 
     /**
      * @param array Method[] $methods
@@ -98,7 +67,7 @@ interface GeneratorInterface
     public function output($output = true);
 
     /**
-     * @param null|string $file
+     * @param string $file
      * @return int
      */
     public function save($file = null);

@@ -72,7 +72,7 @@ class Object extends Generate
     }
 
     /**
-     * @param Object $object
+     * @param self $object
      * @return $this
      */
     public function setExtends(self $object)
@@ -87,7 +87,7 @@ class Object extends Generate
      */
     public function getExtends()
     {
-        return null === $this->extend ? '' : ' extends ' . str_replace('\\\\', '\\', implode('\\', [$this->extend->getNamespace(), $this->extend->getName()]));
+        return null === $this->extend ? '' : ' extends \\' . str_replace('\\\\', '\\', implode('\\', [$this->extend->getNamespace(), $this->extend->getName()]));
     }
 
     /**
@@ -158,16 +158,22 @@ class Object extends Generate
             $properties[] = $property->generate();
         }
 
-        $properties = implode(PHP_EOL, $properties);
+        if (!empty($properties)) {
+            $properties = PHP_EOL . implode(PHP_EOL, $properties) . PHP_EOL;
+        } else {
+            $properties = '';
+        }
 
         $interfaces = [];
 
         foreach ($this->interfaces as $interface) {
-            $interfaces[] = str_replace('\\\\', '\\', implode('\\', [$interface->getNamespace(), $interface->getName()]));
+            $interfaces[] = '\\' . str_replace('\\\\', '\\', implode('\\', [$interface->getNamespace(), $interface->getName()]));
         }
 
         if (!empty($interfaces)) {
-            $interfaces = 'implements ' . implode(',', $interfaces);
+            $interfaces = ' implements ' . implode(',', $interfaces);
+        } else {
+            $interfaces = '';
         }
 
         $methods = [];
@@ -176,15 +182,18 @@ class Object extends Generate
             $methods[] = $method->generate();
         }
 
-        $methods = implode(PHP_EOL, $methods);
+        if (!empty($methods)) {
+            $methods = PHP_EOL . implode(PHP_EOL, $methods) . PHP_EOL;
+        } else {
+            $methods = '';
+        }
+
+        $namespace = $this->namespace ? PHP_EOL . "namespace {$this->getNamespace()};" . PHP_EOL : '';
 
         return <<<M
-
-{$this->getType()} {$this->getName()} {$this->getExtends()} {$interfaces}
-{
-    {$properties}
-
-    {$methods}
+{$namespace}
+{$this->getType()} {$this->getName()}{$this->getExtends()}{$interfaces}
+{{$properties}{$methods}
 }
 M;
     }

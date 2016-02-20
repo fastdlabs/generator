@@ -23,107 +23,34 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 {
     public function testBase()
     {
-        $generator = new Generator(__DIR__ . '/Output/Test.php');
+        $generator = new Generator(__DIR__ . '/Output/Test.php', "Test");
 
-        $this->assertEquals('Test', $generator->getClassName());
-
-        $this->assertEquals('', $generator->getNamespace());
-
-        $this->assertEquals(__DIR__ . '/Output/Test.php', $generator->getFileName());
+//        echo $generator->output();
     }
 
-    public function testProperty()
+    public function testExtends()
     {
-        $name = new Property('name');
+        $generator = new Generator(__DIR__ . '/Output/Test.php', "Test");
 
-//        echo $name->generate();
+        $ext = new Object('Base', "Base");
 
-        $name = new Property('name', Property::PROPERTY_ACCESS_PRIVATE);
+        $generator->setExtends($ext);
 
-//        echo $name->generate();
-
-        $name = new Property('name', Property::PROPERTY_ACCESS_PROTECTED, 'string');
-
-//        echo $name->generate();
-
-        $name = new Property('name', Property::PROPERTY_CONST, 'string');
-
-//        echo $name->generate();
-
-        $name = new Property('name', Property::PROPERTY_ACCESS_PROTECTED, 'string');
-
-        $name->setStatic();
-
-//        echo $name->generate();
+        echo $generator->output();
     }
 
-    public function testMethod()
+    public function testImplements()
     {
-        $method = new Method('name');
+        $generator = new Generator(__DIR__ . '/Output/Test.php', "Test");
 
-//        echo $method->generate();
+        $ext = new Object('Base', "Base");
 
-        $method = new Method('name', Method::METHOD_ACCESS_PROTECTED);
+        $generator->setExtends($ext);
 
-//        echo $method->generate();
+        $interface = new Object('BI', 'Bi');
 
-        $method = new Method('name', Method::METHOD_ACCESS_PRIVATE);
+        $generator->setImplements([$interface]);
 
-//        echo $method->generate();
-
-        $method = new Method('name', Method::METHOD_ACCESS_PUBLIC, Method::METHOD_STATIC);
-
-//        echo $method->generate();
-
-        $method = new Method('name', Method::METHOD_ACCESS_PUBLIC, Method::METHOD_ABSTRACT);
-
-//        echo $method->generate();
-
-        $method = new Method('name', Method::METHOD_ACCESS_PUBLIC, Method::METHOD_INTERFACE);
-
-//        echo $method->generate();
-
-        $method = new Method('name', Method::METHOD_ACCESS_PUBLIC, Method::METHOD_INTERFACE);
-
-        $method->setParams([
-            'name',
-            new Object('test'),
-            new Object('test2', 'Abc'),
-        ]);
-
-//        echo $method->generate();
-    }
-
-    public function testGetSetter()
-    {
-        $getSetter = new GetSetter('name', 'string');
-
-//        echo $getSetter->generate();
-
-        $getSetter = new GetSetter('age', 'int');
-
-//        echo $getSetter->generate();
-    }
-
-    public function testObject()
-    {
-        $object = new Object('Test');
-
-        $object->setProperties([
-            new Property('name', Property::PROPERTY_ACCESS_PROTECTED, 'string')
-        ]);
-
-        $object->setExtends(new Object('FileInfo'));
-
-        $object->setImplements([
-            new Object('Iterator'),
-        ]);
-
-        $object->setMethods([
-            new GetSetter('name', 'string'),
-            new Method('age', Method::METHOD_ACCESS_PROTECTED, Method::METHOD_STATIC),
-        ]);
-
-        echo $object->generate();
+        echo $generator->output();
     }
 }

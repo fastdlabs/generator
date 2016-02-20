@@ -14,16 +14,14 @@
 
 namespace FastD\Generator;
 
-use FastD\Generator\Factory\Method;
 use FastD\Generator\Factory\Object;
-use FastD\Generator\Factory\Property;
 
 /**
  * Class Generator
  *
  * @package FastD\Generator
  */
-class Generator implements GeneratorInterface
+class Generator extends Object implements GeneratorInterface
 {
     /**
      * @var string
@@ -31,51 +29,24 @@ class Generator implements GeneratorInterface
     protected $file;
 
     /**
-     * @var string
-     */
-    protected $class;
-
-    /**
-     * @var string
-     */
-    protected $namespace;
-
-    /**
-     * @var Property[]
-     */
-    protected $properties = [];
-
-    /**
-     * @var Method[]
-     */
-    protected $methods = [];
-
-    /**
      * Generator constructor.
-     * @param $name
+     * @param $file
      * @param null $namespace
+     * @param string $type
      */
-    public function __construct($name, $namespace = null)
+    public function __construct($file, $namespace = null, $type = Object::OBJECT_CLASS)
     {
-        $this->file = $name;
+        $this->file = $file;
 
-        $this->namespace = $namespace;
+        $name = ucfirst(pathinfo($file, PATHINFO_FILENAME));
 
-        $this->class = pathinfo($name, PATHINFO_FILENAME);
+        parent::__construct($name, $namespace, $type);
     }
 
     /**
      * @return string
      */
-    public function getClassName()
-    {
-        return $this->class;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFileName()
+    public function getFile()
     {
         return $this->file;
     }
@@ -83,87 +54,9 @@ class Generator implements GeneratorInterface
     /**
      * @return string
      */
-    public function getNamespace()
+    public function getClassName()
     {
-        return $this->namespace;
-    }
-
-    /**
-     * @param Property $property
-     * @return GeneratorInterface
-     */
-    public function setProperty(Property $property)
-    {
-        $this->properties[$property->getName()] = $property;
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @return Property
-     */
-    public function getProperty($name)
-    {
-        return isset($this->properties[$name]) ? $this->properties[$name] : null;
-    }
-
-    /**
-     * @param array Property[] $properties
-     * @return GeneratorInterface
-     */
-    public function setProperties(array $properties)
-    {
-        $this->properties = array_merge($this->properties, $properties);
-
-        return $this;
-    }
-
-    /**
-     * @return Property[]
-     */
-    public function getProperties()
-    {
-        return $this->properties;
-    }
-
-    /**
-     * @param Method $method
-     * @return GeneratorInterface
-     */
-    public function setMethod(Method $method)
-    {
-        $this->methods[$method->getName()] = $method;
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @return Method
-     */
-    public function getMethod($name)
-    {
-        return isset($this->methods[$name]) ? $this->methods[$name] : null;
-    }
-
-    /**
-     * @param array Method[] $methods
-     * @return GeneratorInterface
-     */
-    public function setMethods(array $methods)
-    {
-        $this->methods = array_merge($this->methods, $methods);
-
-        return $this;
-    }
-
-    /**
-     * @return Method[]
-     */
-    public function getMethods()
-    {
-        return $this->methods;
+        return parent::getName();
     }
 
     /**
@@ -172,13 +65,13 @@ class Generator implements GeneratorInterface
      */
     public function output($output = true)
     {
-        $object = new Object($this->class, $this->namespace, $this->properties, $this->methods);
+        $str = $this->generate();
 
         if (!$output) {
-            return $object->generate();
+            return $str;
         }
 
-        echo $object->generate();
+        echo $str;
     }
 
     /**
@@ -187,7 +80,7 @@ class Generator implements GeneratorInterface
      */
     public function save($file = null)
     {
-        // TODO: Implement save() method.
+        return file_put_contents($file ?? $this->file, '<?php' . PHP_EOL . $this->output(false));
     }
 
     /**
@@ -195,6 +88,6 @@ class Generator implements GeneratorInterface
      */
     public function getParser()
     {
-        // TODO: Implement getParser() method.
+
     }
 }
