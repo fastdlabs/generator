@@ -46,7 +46,7 @@ class Object extends Generate
     protected $extend;
 
     /**
-     * @var Interfaced[]
+     * @var self[]
      */
     protected $interfaces = [];
 
@@ -63,11 +63,18 @@ class Object extends Generate
         parent::__construct($name, $type, 'Class ' . $name);
     }
 
+    /**
+     * @return null|string
+     */
     public function getNamespace()
     {
         return $this->namespace;
     }
 
+    /**
+     * @param Object $object
+     * @return $this
+     */
     public function setExtends(self $object)
     {
         $this->extend = $object;
@@ -75,11 +82,18 @@ class Object extends Generate
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getExtends()
     {
-        return null === $this->extend ? '' : ' extends ' . $this->extend->getName();
+        return null === $this->extend ? '' : ' extends ' . str_replace('\\\\', '\\', implode('\\', [$this->extend->getNamespace(), $this->extend->getName()]));
     }
 
+    /**
+     * @param array $interfaces
+     * @return $this
+     */
     public function setImplements(array $interfaces)
     {
         $this->interfaces = $interfaces;
@@ -87,13 +101,18 @@ class Object extends Generate
         return $this;
     }
 
+    /**
+     * @return Object[]
+     */
     public function getImplements()
     {
-        foreach ($this->interfaces as $interface) {
-            $interface->getName();
-        }
+        return $this->interfaces;
     }
 
+    /**
+     * @param array $properties
+     * @return $this
+     */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
@@ -101,11 +120,18 @@ class Object extends Generate
         return $this;
     }
 
+    /**
+     * @return Property[]
+     */
     public function getProperties()
     {
         return $this->properties;
     }
 
+    /**
+     * @param array $methods
+     * @return $this
+     */
     public function setMethods(array $methods)
     {
         $this->methods = $methods;
@@ -113,11 +139,17 @@ class Object extends Generate
         return $this;
     }
 
+    /**
+     * @return Method[]
+     */
     public function getMethods()
     {
         return $this->methods;
     }
 
+    /**
+     * @return string
+     */
     public function generate()
     {
         $properties = [];
@@ -127,6 +159,16 @@ class Object extends Generate
         }
 
         $properties = implode(PHP_EOL, $properties);
+
+        $interfaces = [];
+
+        foreach ($this->interfaces as $interface) {
+            $interfaces[] = str_replace('\\\\', '\\', implode('\\', [$interface->getNamespace(), $interface->getName()]));
+        }
+
+        if (!empty($interfaces)) {
+            $interfaces = 'implements ' . implode(',', $interfaces);
+        }
 
         $methods = [];
 
@@ -138,7 +180,7 @@ class Object extends Generate
 
         return <<<M
 
-{$this->getType()} {$this->getName()}
+{$this->getType()} {$this->getName()} {$this->getExtends()} {$interfaces}
 {
     {$properties}
 
@@ -147,8 +189,11 @@ class Object extends Generate
 M;
     }
 
+    /**
+     * @return string
+     */
     public function skeleton()
     {
-        // TODO: Implement skeleton() method.
+        return $this->generate();
     }
 }

@@ -31,6 +31,9 @@ abstract class Generate
      */
     protected $type;
 
+    /**
+     * @var string
+     */
     protected $desc;
 
     /**
@@ -51,11 +54,17 @@ abstract class Generate
         $this->desc = $desc;
     }
 
+    /**
+     * @return string
+     */
     public function getDesc()
     {
         return $this->desc;
     }
 
+    /**
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
@@ -72,4 +81,9 @@ abstract class Generate
     abstract public function generate();
 
     abstract public function skeleton();
+
+    public function __toString()
+    {
+        return $this->generate();
+    }
 }

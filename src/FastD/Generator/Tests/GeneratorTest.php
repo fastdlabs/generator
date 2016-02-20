@@ -98,7 +98,11 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $getSetter = new GetSetter('name', 'string');
 
-        echo $getSetter->generate();
+//        echo $getSetter->generate();
+
+        $getSetter = new GetSetter('age', 'int');
+
+//        echo $getSetter->generate();
     }
 
     public function testObject()
@@ -106,13 +110,20 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
         $object = new Object('Test');
 
         $object->setProperties([
-            new Property('name')
+            new Property('name', Property::PROPERTY_ACCESS_PROTECTED, 'string')
+        ]);
+
+        $object->setExtends(new Object('FileInfo'));
+
+        $object->setImplements([
+            new Object('Iterator'),
         ]);
 
         $object->setMethods([
-            new GetSetter('name')
+            new GetSetter('name', 'string'),
+            new Method('age', Method::METHOD_ACCESS_PROTECTED, Method::METHOD_STATIC),
         ]);
 
-//        echo $object->generate();
+        echo $object->generate();
     }
 }

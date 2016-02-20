@@ -35,8 +35,18 @@ class Method extends Generate
      */
     protected $params = [];
 
+    /**
+     * @var string
+     */
     protected $access;
 
+    /**
+     * Method constructor.
+     * @param $name
+     * @param string $access
+     * @param string $type
+     * @param null $desc
+     */
     public function __construct($name, $access = self::METHOD_ACCESS_PUBLIC, $type = self::METHOD_NULL, $desc = null)
     {
         $this->access = $access;
@@ -44,6 +54,10 @@ class Method extends Generate
         parent::__construct($name, $type, $desc);
     }
 
+    /**
+     * @param array $params
+     * @return $this
+     */
     public function setParams(array $params)
     {
         $this->params = $params;
@@ -51,16 +65,25 @@ class Method extends Generate
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getAccess()
     {
         return $this->access;
     }
 
+    /**
+     * @return string
+     */
     public function generate()
     {
         return $this->skeleton();
     }
 
+    /**
+     * @return string
+     */
     public function skeleton()
     {
         $params = [];

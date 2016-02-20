@@ -14,18 +14,34 @@
 
 namespace FastD\Generator\Factory;
 
+/**
+ * Class GetSetter
+ *
+ * @package FastD\Generator\Factory
+ */
 class GetSetter extends Method
 {
+    /**
+     * GetSetter constructor.
+     * @param $name
+     * @param string $type
+     */
     public function __construct($name, $type = 'mixed')
     {
         parent::__construct($name, Method::METHOD_ACCESS_PUBLIC, $type, '');
     }
 
+    /**
+     * @return string
+     */
     public function generate()
     {
         return $this->skeleton();
     }
 
+    /**
+     * @return string
+     */
     public function skeleton()
     {
         $name = ucfirst($this->name);
