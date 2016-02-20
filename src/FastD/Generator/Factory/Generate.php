@@ -70,4 +70,6 @@ abstract class Generate
     }
 
     abstract public function generate();
+
+    abstract public function skeleton();
 }

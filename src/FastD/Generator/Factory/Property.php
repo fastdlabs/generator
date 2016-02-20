@@ -14,17 +14,113 @@
 
 namespace FastD\Generator\Factory;
 
+/**
+ * Class Property
+ *
+ * @package FastD\Generator\Factory
+ */
 class Property extends Generate
 {
+    const PROPERTY_CONST     = 'const';
+    const PROPERTY_ACCESS_PUBLIC    = 'public';
+    const PROPERTY_ACCESS_PROTECTED = 'protected';
+    const PROPERTY_ACCESS_PRIVATE   = 'private';
+    const PROPERTY_ACCESS_STATIC    = 'static ';
+
+    /**
+     * @var string
+     */
+    protected $access;
+
+    /**
+     * @var string
+     */
+    protected $value;
+
+    /**
+     * @var string
+     */
+    protected $static;
+
+    /**
+     * Property constructor.
+     * @param $name
+     * @param string $access
+     * @param string $type
+     * @param null $desc
+     */
+    public function __construct($name, $access = self::PROPERTY_ACCESS_PROTECTED, $type = 'mixed', $desc = null)
+    {
+        $this->access = $access;
+
+        parent::__construct($name, $type, $desc);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccess()
+    {
+        return $this->access;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setStatic()
+    {
+        $this->static = self::PROPERTY_ACCESS_STATIC;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function generate()
     {
-        return <<<M
+        return $this->skeleton();
+    }
+
     /**
-     * {$this->name}
-     *
-     * @param {$this->getType()}
+     * @return string
      */
-    protected \${$this->name};
+    public function skeleton()
+    {
+        if ($this->getAccess() == self::PROPERTY_CONST) {
+            $name = strtoupper($this->name);
+            $value = $this->getValue() ? '\'' . $this->getValue() . '\'' : 'null';
+            return <<<M
+    /**
+     * @const {$this->getType()}
+     */
+    {$this->getAccess()} {$name} = {$value};
+M;
+        }
+        return <<<M
+    /*
+     * @var {$this->getType()}
+     */
+    {$this->getAccess()} {$this->static}\${$this->name};
 M;
     }
 }
