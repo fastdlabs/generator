@@ -21,8 +21,7 @@ namespace FastD\Generator\Parser;
 interface ParserInterface
 {
     /**
-     * @param $name
      * @return string
      */
-    public function getContent($name);
+    public function getContent();
 }

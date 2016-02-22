@@ -29,17 +29,30 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * $parser = new ObjectParser();
+     * $generator = $parser->getGenerator();
+     * $generator->setMethods();
+     * $generator->save();
+     */
     public function testObject()
-    {
-        $parser = new ObjectParse('\\Test\\Test');
-
-        echo $parser->getContent();
-    }
-
-    public function testObject2()
     {
         $parser = new ObjectParse('\\Test\\Test2');
 
-        echo $parser->getContent();
+        $this->assertEquals(15, $parser->getStartLine()); // namespace start
+        $this->assertEquals(23, $parser->getEndLine());
+        $this->assertEquals([
+            'FastD\Generator\Generator'
+        ], $parser->getUsageNamespaces());
+
+    }
+
+    public function testObjectExistsMethods()
+    {
+        $parser = new ObjectParse('\\Test\\Test2');
+
+        foreach ($parser->getMethods() as $method) {
+            print_r($method);
+        }
     }
 }

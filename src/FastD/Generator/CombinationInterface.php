@@ -16,5 +16,7 @@ namespace FastD\Generator;
 
 interface CombinationInterface
 {
-    public function combination(array $files);
+    public function appendClass($class);
+
+    public function combination(array $classes);
 }

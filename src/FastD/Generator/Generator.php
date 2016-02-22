@@ -25,42 +25,15 @@ use FastD\Generator\Factory\Object;
  */
 class Generator extends Object implements GeneratorInterface
 {
-    /**
-     * @var string
-     */
-    protected $file;
-
     protected $parser;
 
-    /**
-     * Generator constructor.
-     * @param $file
-     * @param null $namespace
-     * @param string $type
-     */
-    public function __construct($file, $namespace = null, $type = Object::OBJECT_CLASS)
+    public function __construct($name, $namespace = null, $type = null)
     {
-        $this->file = $file;
-
-        $name = ucfirst(pathinfo($file, PATHINFO_FILENAME));
+        try {
+            $this->parser = new ObjectParse($name);
+        } catch (\Exception $e) {}
 
         parent::__construct($name, $namespace, $type);
-    }
-
-    /**
-     * @return string
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClassName()
-    {
-        return parent::getName();
     }
 
     /**
@@ -82,16 +55,16 @@ class Generator extends Object implements GeneratorInterface
      * @param null|string $file
      * @return int
      */
-    public function save($file = null)
+    public function save($file)
     {
-        return file_put_contents($file ?? $this->file, '<?php' . PHP_EOL . $this->output(false));
+        return file_put_contents($file, '<?php' . PHP_EOL . $this->output(false));
     }
 
     /**
-     * @return Parser
+     * @return mixed
      */
     public function getParser()
     {
-        return new ObjectParse($this);
+        return $this->parser;
     }
 }

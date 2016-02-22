@@ -26,16 +26,6 @@ interface GeneratorInterface
     /**
      * @return string
      */
-    public function getFile();
-
-    /**
-     * @return string
-     */
-    public function getClassName();
-
-    /**
-     * @return string
-     */
     public function getNamespace();
 
     /**
@@ -70,7 +60,7 @@ interface GeneratorInterface
      * @param string $file
      * @return int
      */
-    public function save($file = null);
+    public function save($file);
 
     /**
      * @return mixed

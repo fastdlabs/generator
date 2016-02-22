@@ -14,43 +14,106 @@
 
 namespace FastD\Generator\Parser;
 
+/**
+ * Class ObjectParse
+ *
+ * @package FastD\Generator\Parser
+ */
 class ObjectParse extends \ReflectionClass implements ParserInterface
 {
-    protected $content = '';
+    /**
+     * @var int
+     */
+    protected $startLine = 1;
 
-    public function getUsageNamespace()
+    /**
+     * @var string
+     */
+    protected $content;
+
+    /**
+     * @var array
+     */
+    protected $namespaces = [];
+
+    /**
+     * ObjectParse constructor.
+     * @param mixed $argument
+     */
+    public function __construct($argument)
     {
+        parent::__construct($argument);
 
+        $this->parseContent();
     }
 
     /**
-     * @param $name
+     * @return int
+     */
+    public function getStartLine()
+    {
+        return $this->startLine;
+    }
+
+    /**
      * @return string
      */
-    public function getContent($name = null)
+    protected function parseContent()
     {
-        if (!empty($this->content)) {
-            return $this->content;
+        if (empty($this->content)) {
+            $file = new \SplFileObject($this->getFileName());
+            // Get file content and parse namespace and use.
+            $i = 1;
+            while (!$file->eof()) {
+                $line = $file->fgets();
+                // The class namespace start line.
+                if ('namespace' == substr($line, 0, 9)) {
+                    $this->startLine = $i;
+                }
+                // The class use classes.
+                if ('use' == substr($line, 0, 3)) {
+                    $this->namespaces[$this->getName()] = array_merge($this->namespaces[$this->getName()] ?? [], explode(',', substr($line, strpos($line, ' ') + 1, -2)));
+                }
+                $i++;
+            }
+            // Get class content.
+            $file->seek(parent::getStartLine() - 1);
+            $length = $this->getEndLine() - parent::getStartLine() + 1;
+            $i = 0;
+            while ($i < $length) {
+                $this->content .= $file->current();
+                $file->next();
+                $i++;
+            }
+
+            $namespace = $this->namespaces ? 'namespace ' . $this->getNamespaceName() . ';' . PHP_EOL . PHP_EOL : '';
+
+            $use = $this->getUsageNamespaces() ? 'use ' . implode(',' . PHP_EOL, $this->getUsageNamespaces()) . PHP_EOL . PHP_EOL : '';
+
+            $this->content = $namespace . $use . $this->content;
         }
-
-        $file = new \SplFileObject($this->getFileName());
-
-        $start = $this->getStartLine() - 1 - substr_count($this->getDocComment(), PHP_EOL) - 1;
-
-        $i = 1;$length = $this->getEndLine() - $start + 2;
-
-        $file->seek($start);
-
-        while ($i < $length) {
-            $this->content .= $file->current();
-            $file->next();
-            $i++;
-        }
-
-        $namespace = $this->getNamespaceName() ? 'namespace ' . $this->getNamespaceName() . PHP_EOL : '';
-
-        $this->content = $namespace . $this->content;
 
         return $this->content;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUsageNamespaces()
+    {
+        return $this->namespaces[$this->getName()] ?? [];
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    public function getGenerator()
+    {
+
     }
 }

@@ -14,7 +14,10 @@
 
 namespace Test;
 
+use FastD\Generator\Generator;
+
 class Test2
 {
-
+    public function test(Generator $generator)
+    {}
 }

@@ -18,13 +18,11 @@ use FastD\Generator\Parser\ParserInterface;
 
 class MethodParser extends \ReflectionMethod implements ParserInterface
 {
-
     /**
-     * @param $name
      * @return string
      */
-    public function getContent($name)
+    public function getContent()
     {
-        // TODO: Implement getContent() method.
+
     }
 }

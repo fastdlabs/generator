@@ -23,14 +23,14 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 {
     public function testBase()
     {
-        $generator = new Generator(__DIR__ . '/Output/Test.php', "Test");
+        $generator = new Generator('Test', "Test");
 
 //        echo $generator->output();
     }
 
     public function testExtends()
     {
-        $generator = new Generator(__DIR__ . '/Output/Test.php', "Test");
+        $generator = new Generator('Test', "Test");
 
         $ext = new Object('Base', "Base");
 
@@ -41,7 +41,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testImplements()
     {
-        $generator = new Generator(__DIR__ . '/Output/Test.php', "Test");
+        $generator = new Generator('Test', "Test");
 
         $ext = new Object('Base', "Base");
 
