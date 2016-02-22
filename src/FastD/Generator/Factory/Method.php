@@ -41,6 +41,11 @@ class Method extends Generate
     protected $access;
 
     /**
+     * @var string
+     */
+    protected $todo = '// TODO...';
+
+    /**
      * Method constructor.
      * @param $name
      * @param string $access
@@ -63,6 +68,33 @@ class Method extends Generate
         $this->params = $params;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param $todo
+     * @return $this
+     */
+    public function setTodo($todo)
+    {
+        $this->todo = $todo;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTodo()
+    {
+        return $this->todo;
     }
 
     /**
@@ -111,7 +143,7 @@ M;
                 return <<<M
     {$this->getAccess()} {$this->getType()} function {$this->name}({$params})
     {
-        // TODO...
+        {$this->getTodo()}
     }
 M;
                 break;
@@ -120,7 +152,7 @@ M;
                 return <<<M
     {$this->getAccess()} function {$this->name}({$params})
     {
-        // TODO...
+        {$this->getTodo()}
     }
 M;
 

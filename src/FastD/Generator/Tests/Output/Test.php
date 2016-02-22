@@ -1,7 +1,9 @@
 <?php
 
-namespace Test;
-
-class Test  
+namespace Test
 {
+    class Test
+    {
+
+    }
 }

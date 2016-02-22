@@ -12,9 +12,7 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Database\ORM\Parser;
 
-use FastD\Database\Drivers\DriverInterface;
 
 /**
  * Class TableParser

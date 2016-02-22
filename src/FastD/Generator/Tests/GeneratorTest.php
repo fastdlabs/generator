@@ -36,7 +36,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 
         $generator->setExtends($ext);
 
-        echo $generator->output();
+//        echo $generator->output();
     }
 
     public function testImplements()
@@ -51,6 +51,6 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 
         $generator->setImplements([$interface]);
 
-        echo $generator->output();
+//        echo $generator->output();
     }
 }

@@ -14,6 +14,8 @@
 
 namespace FastD\Generator;
 
+use FastD\Generator\Parser\Parser;
+use FastD\Generator\Parser\ObjectParse;
 use FastD\Generator\Factory\Object;
 
 /**
@@ -27,6 +29,8 @@ class Generator extends Object implements GeneratorInterface
      * @var string
      */
     protected $file;
+
+    protected $parser;
 
     /**
      * Generator constructor.
@@ -61,7 +65,7 @@ class Generator extends Object implements GeneratorInterface
 
     /**
      * @param bool $output
-     * @return string|void
+     * @return string|int
      */
     public function output($output = true)
     {
@@ -84,10 +88,10 @@ class Generator extends Object implements GeneratorInterface
     }
 
     /**
-     * @return mixed
+     * @return Parser
      */
     public function getParser()
     {
-
+        return new ObjectParse($this);
     }
 }
