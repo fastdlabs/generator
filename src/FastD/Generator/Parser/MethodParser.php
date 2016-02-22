@@ -12,12 +12,29 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Database\ORM\Parser;
+namespace FastD\Generator\Parser;
 
-use FastD\Generator\Parser\ParserInterface;
-
-class MethodParser extends \ReflectionMethod implements ParserInterface
+class MethodParser implements ParserInterface
 {
+    protected $method;
+
+    protected $content;
+
+    public function __construct(\ReflectionMethod $method)
+    {
+        $this->method = $method;
+    }
+
+    public function getName()
+    {
+        return $this->method->getName();
+    }
+
+    public function getParameters()
+    {
+        return $this->method->getParameters();
+    }
+
     /**
      * @return string
      */

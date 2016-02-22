@@ -16,12 +16,4 @@ namespace FastD\Generator\Parser;
 
 class PropertyParser extends \ReflectionProperty implements ParserInterface
 {
-    /**
-     * @param $name
-     * @return string
-     */
-    public function getContent($name)
-    {
-
-    }
 }

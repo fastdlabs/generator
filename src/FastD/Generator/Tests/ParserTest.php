@@ -30,9 +30,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * $parser = new ObjectParser();
-     * $generator = $parser->getGenerator();
-     * $generator->setMethods();
+     * $generator = new Generator();
      * $generator->save();
      */
     public function testObject()

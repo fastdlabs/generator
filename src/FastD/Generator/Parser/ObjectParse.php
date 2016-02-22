@@ -19,12 +19,17 @@ namespace FastD\Generator\Parser;
  *
  * @package FastD\Generator\Parser
  */
-class ObjectParse extends \ReflectionClass implements ParserInterface
+class ObjectParse extends Parser implements ParserInterface
 {
     /**
      * @var int
      */
     protected $startLine = 1;
+
+    /**
+     * @var MethodParser[]
+     */
+    protected $methods = [];
 
     /**
      * @var string
@@ -36,13 +41,15 @@ class ObjectParse extends \ReflectionClass implements ParserInterface
      */
     protected $namespaces = [];
 
+    protected $reflection;
+
     /**
      * ObjectParse constructor.
-     * @param mixed $argument
+     * @param mixed $class
      */
-    public function __construct($argument)
+    public function __construct($class)
     {
-        parent::__construct($argument);
+        $this->reflection = new \ReflectionClass($class);
 
         $this->parseContent();
     }
@@ -55,13 +62,33 @@ class ObjectParse extends \ReflectionClass implements ParserInterface
         return $this->startLine;
     }
 
+    public function getEndLine()
+    {
+        return $this->reflection->getEndLine();
+    }
+
+    /**
+     * @param null $filter
+     * @return MethodParser[]
+     */
+    public function getMethods($filter = null)
+    {
+        if (empty($this->methods)) {
+            foreach ($this->reflection->getMethods($filter) as $method) {
+                $this->methods[] = new MethodParser($method);
+            }
+        }
+
+        return $this->methods;
+    }
+
     /**
      * @return string
      */
     protected function parseContent()
     {
         if (empty($this->content)) {
-            $file = new \SplFileObject($this->getFileName());
+            $file = new \SplFileObject($this->reflection->getFileName());
             // Get file content and parse namespace and use.
             $i = 1;
             while (!$file->eof()) {
@@ -72,13 +99,13 @@ class ObjectParse extends \ReflectionClass implements ParserInterface
                 }
                 // The class use classes.
                 if ('use' == substr($line, 0, 3)) {
-                    $this->namespaces[$this->getName()] = array_merge($this->namespaces[$this->getName()] ?? [], explode(',', substr($line, strpos($line, ' ') + 1, -2)));
+                    $this->namespaces[$this->reflection->getName()] = array_merge($this->namespaces[$this->reflection->getName()] ?? [], explode(',', substr($line, strpos($line, ' ') + 1, -2)));
                 }
                 $i++;
             }
             // Get class content.
-            $file->seek(parent::getStartLine() - 1);
-            $length = $this->getEndLine() - parent::getStartLine() + 1;
+            $file->seek($this->reflection->getStartLine()- 1);
+            $length = $this->reflection->getEndLine() - $this->reflection->getStartLine() + 1;
             $i = 0;
             while ($i < $length) {
                 $this->content .= $file->current();
@@ -86,7 +113,7 @@ class ObjectParse extends \ReflectionClass implements ParserInterface
                 $i++;
             }
 
-            $namespace = $this->namespaces ? 'namespace ' . $this->getNamespaceName() . ';' . PHP_EOL . PHP_EOL : '';
+            $namespace = $this->namespaces ? 'namespace ' . $this->reflection->getNamespaceName() . ';' . PHP_EOL . PHP_EOL : '';
 
             $use = $this->getUsageNamespaces() ? 'use ' . implode(',' . PHP_EOL, $this->getUsageNamespaces()) . PHP_EOL . PHP_EOL : '';
 
@@ -101,7 +128,7 @@ class ObjectParse extends \ReflectionClass implements ParserInterface
      */
     public function getUsageNamespaces()
     {
-        return $this->namespaces[$this->getName()] ?? [];
+        return $this->namespaces[$this->reflection->getName()] ?? [];
     }
 
     /**
@@ -110,10 +137,5 @@ class ObjectParse extends \ReflectionClass implements ParserInterface
     public function getContent()
     {
         return $this->content;
-    }
-
-    public function getGenerator()
-    {
-
     }
 }
