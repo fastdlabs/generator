@@ -14,8 +14,31 @@
 
 namespace FastD\Generator\Parser;
 
+/**
+ * Class Parser
+ *
+ * @package FastD\Generator\Parser
+ */
 abstract class Parser implements ParserInterface
 {
+    /**
+     * @var \Reflector
+     */
+    protected $reflector;
+
+    /**
+     * Parser constructor.
+     * @param \Reflector $reflector
+     */
+    public function __construct(\Reflector $reflector)
+    {
+        $this->reflector = $reflector;
+    }
+
+    /**
+     * @param $name
+     * @return mixed|string
+     */
     public function parseName($name)
     {
         if (strpos($name, '_')) {

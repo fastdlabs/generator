@@ -14,25 +14,32 @@
 
 namespace FastD\Generator\Parser;
 
-class MethodParser implements ParserInterface
+/**
+ * Class MethodParser
+ *
+ * @package FastD\Generator\Parser
+ */
+class MethodParser extends Parser implements ParserInterface
 {
-    protected $method;
-
+    /**
+     * @var string
+     */
     protected $content;
 
-    public function __construct(\ReflectionMethod $method)
-    {
-        $this->method = $method;
-    }
-
+    /**
+     * @return string
+     */
     public function getName()
     {
-        return $this->method->getName();
+        return $this->reflector->getName();
     }
 
+    /**
+     * @return \ReflectionParameter[]
+     */
     public function getParameters()
     {
-        return $this->method->getParameters();
+        return $this->reflector->getParameters();
     }
 
     /**
@@ -40,6 +47,21 @@ class MethodParser implements ParserInterface
      */
     public function getContent()
     {
-
+        $i = 0;
+        $startLine = $this->reflector->getStartLine() - 1;
+        $length = $this->reflector->getEndLine() - $startLine;
+        $file = new \SplFileObject($this->reflector->getFileName());
+        $file->seek($startLine);
+        $content = '';
+        while ($i < $length) {
+            $content .= $file->current();
+            $file->next();
+            $i++;
+        }
+        $doc = '';
+        if ($this->reflector->getDocComment()) {
+            $doc = $this->reflector->getDocComment() . PHP_EOL;
+        }
+        return $doc . $content;
     }
 }

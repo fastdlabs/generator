@@ -14,6 +14,15 @@
 
 namespace FastD\Generator\Parser;
 
-class PropertyParser extends \ReflectionProperty implements ParserInterface
+use SebastianBergmann\Diff\Parser;
+
+class PropertyParser extends Parser implements ParserInterface
 {
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        // TODO: Implement getContent() method.
+    }
 }

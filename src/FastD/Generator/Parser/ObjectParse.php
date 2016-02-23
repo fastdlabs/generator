@@ -22,14 +22,19 @@ namespace FastD\Generator\Parser;
 class ObjectParse extends Parser implements ParserInterface
 {
     /**
-     * @var int
-     */
-    protected $startLine = 1;
-
-    /**
      * @var MethodParser[]
      */
     protected $methods = [];
+
+    /**
+     * @var PropertyParser[]
+     */
+    protected $properties = [];
+
+    /**
+     * @var int
+     */
+    protected $startLine = 1;
 
     /**
      * @var string
@@ -41,15 +46,13 @@ class ObjectParse extends Parser implements ParserInterface
      */
     protected $namespaces = [];
 
-    protected $reflection;
-
     /**
      * ObjectParse constructor.
      * @param mixed $class
      */
     public function __construct($class)
     {
-        $this->reflection = new \ReflectionClass($class);
+        parent::__construct(new \ReflectionClass($class));
 
         $this->parseContent();
     }
@@ -62,19 +65,21 @@ class ObjectParse extends Parser implements ParserInterface
         return $this->startLine;
     }
 
+    /**
+     * @return int
+     */
     public function getEndLine()
     {
-        return $this->reflection->getEndLine();
+        return $this->reflector->getEndLine();
     }
 
     /**
-     * @param null $filter
      * @return MethodParser[]
      */
-    public function getMethods($filter = null)
+    public function getMethods()
     {
         if (empty($this->methods)) {
-            foreach ($this->reflection->getMethods($filter) as $method) {
+            foreach ($this->reflector->getMethods() as $method) {
                 $this->methods[] = new MethodParser($method);
             }
         }
@@ -83,12 +88,26 @@ class ObjectParse extends Parser implements ParserInterface
     }
 
     /**
+     * @return PropertyParser[]
+     */
+    public function getProperties()
+    {
+        if (empty($this->properties)) {
+            foreach ($this->reflector->getProperties() as $property) {
+                $this->properties[] = new PropertyParser($property);
+            }
+        }
+
+        return $this->properties;
+    }
+
+    /**
      * @return string
      */
     protected function parseContent()
     {
         if (empty($this->content)) {
-            $file = new \SplFileObject($this->reflection->getFileName());
+            $file = new \SplFileObject($this->reflector->getFileName());
             // Get file content and parse namespace and use.
             $i = 1;
             while (!$file->eof()) {
@@ -99,13 +118,13 @@ class ObjectParse extends Parser implements ParserInterface
                 }
                 // The class use classes.
                 if ('use' == substr($line, 0, 3)) {
-                    $this->namespaces[$this->reflection->getName()] = array_merge($this->namespaces[$this->reflection->getName()] ?? [], explode(',', substr($line, strpos($line, ' ') + 1, -2)));
+                    $this->namespaces[$this->reflector->getName()] = array_merge($this->namespaces[$this->reflector->getName()] ?? [], explode(',', substr($line, strpos($line, ' ') + 1, -2)));
                 }
                 $i++;
             }
             // Get class content.
-            $file->seek($this->reflection->getStartLine()- 1);
-            $length = $this->reflection->getEndLine() - $this->reflection->getStartLine() + 1;
+            $file->seek($this->reflector->getStartLine()- 1);
+            $length = $this->reflector->getEndLine() - $this->reflector->getStartLine() + 1;
             $i = 0;
             while ($i < $length) {
                 $this->content .= $file->current();
@@ -113,7 +132,7 @@ class ObjectParse extends Parser implements ParserInterface
                 $i++;
             }
 
-            $namespace = $this->namespaces ? 'namespace ' . $this->reflection->getNamespaceName() . ';' . PHP_EOL . PHP_EOL : '';
+            $namespace = $this->namespaces ? 'namespace ' . $this->reflector->getNamespaceName() . ';' . PHP_EOL . PHP_EOL : '';
 
             $use = $this->getUsageNamespaces() ? 'use ' . implode(',' . PHP_EOL, $this->getUsageNamespaces()) . PHP_EOL . PHP_EOL : '';
 
@@ -128,7 +147,7 @@ class ObjectParse extends Parser implements ParserInterface
      */
     public function getUsageNamespaces()
     {
-        return $this->namespaces[$this->reflection->getName()] ?? [];
+        return $this->namespaces[$this->reflector->getName()] ?? [];
     }
 
     /**

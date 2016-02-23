@@ -18,6 +18,9 @@ use FastD\Generator\Generator;
 
 class Test2
 {
+    /**
+     * @param Generator $generator
+     */
     public function test(Generator $generator)
     {}
 }
