@@ -55,5 +55,8 @@ abstract class Parser implements ParserInterface
     /**
      * @return string
      */
-    abstract public function getContent();
+    public function __toString()
+    {
+        return $this->getContent();
+    }
 }

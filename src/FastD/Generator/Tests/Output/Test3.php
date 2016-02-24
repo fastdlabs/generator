@@ -16,17 +16,12 @@ namespace Test;
 
 use FastD\Generator\Generator;
 
-class Test2
+class Test3
 {
     const TESET = 'abc';
-
-    protected $name = null;
-
-    protected $default = 'jan';
-
     /**
      * @param Generator $generator
      */
-    public function test(Generator $generator, $name = 'test', $test = self::TESET, $four = 11)
+    public function test(Generator $generator = null, $name = 'test', $test = self::TESET)
     {}
 }

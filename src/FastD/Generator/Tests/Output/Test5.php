@@ -16,7 +16,7 @@ namespace Test;
 
 use FastD\Generator\Generator;
 
-class Test2
+class Test5 extends Test implements TestInterface, TestInterface2
 {
     const TESET = 'abc';
 

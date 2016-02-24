@@ -16,7 +16,7 @@ namespace Test;
 
 use FastD\Generator\Generator;
 
-class Test2
+class Test4 extends Test
 {
     const TESET = 'abc';
 

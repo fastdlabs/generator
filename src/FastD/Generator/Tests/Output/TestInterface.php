@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 16/2/22
- * Time: 下午12:33
+ * Date: 16/2/24
+ * Time: 下午8:51
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -14,19 +14,12 @@
 
 namespace Test;
 
-use FastD\Generator\Generator;
-
-class Test2
+interface TestInterface
 {
-    const TESET = 'abc';
 
-    protected $name = null;
+}
 
-    protected $default = 'jan';
+interface TestInterface2
+{
 
-    /**
-     * @param Generator $generator
-     */
-    public function test(Generator $generator, $name = 'test', $test = self::TESET, $four = 11)
-    {}
 }

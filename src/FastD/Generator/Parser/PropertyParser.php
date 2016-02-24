@@ -14,15 +14,69 @@
 
 namespace FastD\Generator\Parser;
 
-use SebastianBergmann\Diff\Parser;
-
 class PropertyParser extends Parser implements ParserInterface
 {
+    /**
+     * @var \ReflectionProperty
+     */
+    protected $reflector;
+
+    protected $name;
+
+    protected $value;
+
+    protected $accessible;
+
+    public function __construct(\ReflectionClass $reflectionClass, $name)
+    {
+        $property = $reflectionClass->getProperty($name);
+
+        parent::__construct($property);
+
+        $this->name = $property->getName();
+
+        $property->setAccessible(true);
+
+        $this->value = $property->getValue($reflectionClass->newInstanceWithoutConstructor());
+
+        if ($property->isPrivate()) {
+            $this->accessible = 'private';
+        } else if ($property->isProtected()) {
+            $this->accessible = 'protected';
+        } else {
+            $this->accessible = 'public';
+        }
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
     /**
      * @return string
      */
     public function getContent()
     {
-        // TODO: Implement getContent() method.
+        $value = $this->getValue();
+
+        if (empty($value)) {
+            $value = '';
+        } else if (is_string($value)) {
+            $value = ' = \'' . $value . '\'';
+        } else {
+            $value = ' = ' . $value;
+        }
+
+        $static = $this->reflector->isStatic() ? ' static ' : '';
+
+        return <<<P
+    {$this->accessible}{$static} \${$this->name}{$value};
+P;
     }
 }

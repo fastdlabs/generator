@@ -22,24 +22,83 @@ namespace FastD\Generator\Parser;
 class MethodParser extends Parser implements ParserInterface
 {
     /**
-     * @var string
+     * @var ParamParser[]
      */
-    protected $content;
+    protected $parameters = [];
 
     /**
-     * @return string
+     * @var \ReflectionMethod
      */
-    public function getName()
+    protected $reflector;
+
+    /**
+     * @var string
+     */
+    protected $accessible;
+
+    /**
+     * @var string
+     */
+    protected $abstract = '';
+
+    /**
+     * @var string
+     */
+    protected $todo = '';
+
+    /**
+     * MethodParser constructor.
+     * @param \ReflectionMethod $reflector
+     */
+    public function __construct(\ReflectionMethod $reflector)
     {
-        return $this->reflector->getName();
+        parent::__construct($reflector);
+
+        foreach ($this->reflector->getParameters() as $parameter) {
+            $this->parameters[$parameter->getName()] = new ParamParser($parameter);
+        }
+
+        if ($this->reflector->isPrivate()) {
+            $this->accessible = 'private';
+        } else if ($this->reflector->isProtected()) {
+            $this->accessible = 'protected';
+        } else {
+            $this->accessible = 'public';
+        }
+
+        $this->abstract = $this->reflector->isAbstract() ? 'abstract ' : '';
+
+        if (empty($this->abstract)) {
+            $file = new \SplFileObject($this->reflector->getFileName());
+            $start = $this->reflector->getStartLine();
+            $end =  $this->reflector->getEndLine();
+            $file->seek($start);
+            while ($start < $end) {
+                $this->todo .= $file->current();
+                $file->next();
+                $start++;
+            }
+        } else {
+            $this->todo = ';';
+        }
+        $this->todo = trim($this->todo);
     }
 
     /**
-     * @return \ReflectionParameter[]
+     * @param $name
+     * @return ParamParser
+     */
+    public function getParameter($name)
+    {
+        return isset($this->parameters[$name]) ? $this->parameters[$name] : null;
+    }
+
+    /**
+     * @return ParamParser[]
      */
     public function getParameters()
     {
-        return $this->reflector->getParameters();
+        return $this->parameters;
     }
 
     /**
@@ -47,21 +106,18 @@ class MethodParser extends Parser implements ParserInterface
      */
     public function getContent()
     {
-        $i = 0;
-        $startLine = $this->reflector->getStartLine() - 1;
-        $length = $this->reflector->getEndLine() - $startLine;
-        $file = new \SplFileObject($this->reflector->getFileName());
-        $file->seek($startLine);
-        $content = '';
-        while ($i < $length) {
-            $content .= $file->current();
-            $file->next();
-            $i++;
+        $parameters = [];
+
+        foreach ($this->parameters as $parameter) {
+            $parameters[] = $parameter->getContent();
         }
-        $doc = '';
-        if ($this->reflector->getDocComment()) {
-            $doc = $this->reflector->getDocComment() . PHP_EOL;
-        }
-        return $doc . $content;
+
+        $parameters = implode(', ', $parameters);
+
+        return <<<M
+    {$this->abstract}{$this->accessible} function {$this->reflector->getName()}($parameters)
+    {$this->todo}
+M;
+
     }
 }

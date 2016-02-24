@@ -22,6 +22,11 @@ namespace FastD\Generator\Parser;
 class ObjectParse extends Parser implements ParserInterface
 {
     /**
+     * @var \ReflectionClass
+     */
+    protected $reflector;
+
+    /**
      * @var MethodParser[]
      */
     protected $methods = [];
@@ -32,14 +37,9 @@ class ObjectParse extends Parser implements ParserInterface
     protected $properties = [];
 
     /**
-     * @var int
+     * @var ConstantParser[]
      */
-    protected $startLine = 1;
-
-    /**
-     * @var string
-     */
-    protected $content;
+    protected $constants = [];
 
     /**
      * @var array
@@ -53,24 +53,47 @@ class ObjectParse extends Parser implements ParserInterface
     public function __construct($class)
     {
         parent::__construct(new \ReflectionClass($class));
-
-        $this->parseContent();
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getStartLine()
+    public function getName()
     {
-        return $this->startLine;
+        return $this->reflector->getShortName();
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getEndLine()
+    public function getNamespace()
     {
-        return $this->reflector->getEndLine();
+        return $this->reflector->getNamespaceName();
+    }
+
+    /**
+     * @return \ReflectionClass
+     */
+    public function getParent()
+    {
+        return $this->reflector->getParentClass();
+    }
+
+    /**
+     * @return array
+     */
+    public function getImplements()
+    {
+        return $this->reflector->getInterfaceNames();
+    }
+
+    /**
+     * @param $name
+     * @return MethodParser
+     */
+    public function getMethod($name)
+    {
+        return new MethodParser($this->reflector->getMethod($name));
     }
 
     /**
@@ -88,13 +111,22 @@ class ObjectParse extends Parser implements ParserInterface
     }
 
     /**
+     * @param $name
+     * @return PropertyParser
+     */
+    public function getProperty($name)
+    {
+        return new PropertyParser($this->reflector, $name);
+    }
+
+    /**
      * @return PropertyParser[]
      */
     public function getProperties()
     {
         if (empty($this->properties)) {
             foreach ($this->reflector->getProperties() as $property) {
-                $this->properties[] = new PropertyParser($property);
+                $this->properties[] = new PropertyParser($this->reflector, $property->getName());
             }
         }
 
@@ -102,52 +134,26 @@ class ObjectParse extends Parser implements ParserInterface
     }
 
     /**
-     * @return string
+     * @param $name
+     * @return ConstantParser
      */
-    protected function parseContent()
+    public function getConstant($name)
     {
-        if (empty($this->content)) {
-            $file = new \SplFileObject($this->reflector->getFileName());
-            // Get file content and parse namespace and use.
-            $i = 1;
-            while (!$file->eof()) {
-                $line = $file->fgets();
-                // The class namespace start line.
-                if ('namespace' == substr($line, 0, 9)) {
-                    $this->startLine = $i;
-                }
-                // The class use classes.
-                if ('use' == substr($line, 0, 3)) {
-                    $this->namespaces[$this->reflector->getName()] = array_merge($this->namespaces[$this->reflector->getName()] ?? [], explode(',', substr($line, strpos($line, ' ') + 1, -2)));
-                }
-                $i++;
-            }
-            // Get class content.
-            $file->seek($this->reflector->getStartLine()- 1);
-            $length = $this->reflector->getEndLine() - $this->reflector->getStartLine() + 1;
-            $i = 0;
-            while ($i < $length) {
-                $this->content .= $file->current();
-                $file->next();
-                $i++;
-            }
-
-            $namespace = $this->namespaces ? 'namespace ' . $this->reflector->getNamespaceName() . ';' . PHP_EOL . PHP_EOL : '';
-
-            $use = $this->getUsageNamespaces() ? 'use ' . implode(',' . PHP_EOL, $this->getUsageNamespaces()) . PHP_EOL . PHP_EOL : '';
-
-            $this->content = $namespace . $use . $this->content;
-        }
-
-        return $this->content;
+        return new ConstantParser($name, $this->reflector->getConstant($name));
     }
 
     /**
-     * @return array
+     * @return ConstantParser[]
      */
-    public function getUsageNamespaces()
+    public function getConstants()
     {
-        return $this->namespaces[$this->reflector->getName()] ?? [];
+        if (empty($this->constants)) {
+            foreach ($this->reflector->getConstants() as $name => $value) {
+                $this->constants[] = new ConstantParser($name, $value);
+            }
+        }
+
+        return $this->constants;
     }
 
     /**
@@ -155,6 +161,57 @@ class ObjectParse extends Parser implements ParserInterface
      */
     public function getContent()
     {
-        return $this->content;
+        $constants = [];
+
+        foreach ($this->getConstants() as $constant) {
+            $constants[] = $constant->getContent();
+        }
+
+        $constants = implode(PHP_EOL, $constants);
+
+        $properties = [];
+
+        foreach ($this->getProperties() as $property) {
+            $properties[] = $property->getContent();
+        }
+
+        $properties = implode(PHP_EOL, $properties);
+
+        $methods = [];
+
+        foreach ($this->getMethods() as $method) {
+            $methods[] = $method->getContent();
+        }
+
+        $methods = implode(PHP_EOL, $methods);
+
+        $namespace = empty($this->getNamespace()) ? '' : 'namespace ' . $this->getNamespace() . ';' . PHP_EOL;
+
+        $parent = '';
+
+        if ($this->getParent()) {
+            $parent = ' extends ' . '\\' . $this->getParent()->getName();
+        }
+
+        $interfaces = [];
+
+        foreach ($this->getImplements() as $implement) {
+            $interfaces[] = '\\' . $implement;
+        }
+
+        if (!empty($interfaces)) {
+            $interfaces = ' implements ' . implode(', ', $interfaces);
+        }
+
+        return <<<C
+{$namespace}
+class {$this->getName()}{$parent}{$interfaces}
+{
+{$constants}
+{$properties}
+{$methods}
+}
+C;
+
     }
 }
