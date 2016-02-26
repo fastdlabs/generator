@@ -108,7 +108,12 @@ class Property extends Generate
     {
         if ($this->getAccess() == self::PROPERTY_CONST) {
             $name = strtoupper($this->name);
-            $value = $this->getValue() ? '\'' . $this->getValue() . '\'' : 'null';
+            $value = $this->getValue() ? $this->getValue() : 'null';
+
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            }
+
             return <<<M
     /**
      * @const {$this->getType()}
