@@ -112,6 +112,8 @@ class Property extends Generate
 
             if (is_array($value)) {
                 $value = var_export($value, true);
+            } else {
+                $value = "'{$value}'";
             }
 
             return <<<M
