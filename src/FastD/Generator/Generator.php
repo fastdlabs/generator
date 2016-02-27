@@ -35,7 +35,10 @@ class Generator extends Object implements GeneratorInterface
             }
             
             $this->parser = new ObjectParse($name);
+
             $this->setUsages($this->parser->getUsages());
+
+            $name = $this->parser->getName();
         } catch (\Exception $e) {}
 
         parent::__construct($name, $namespace, $type);

@@ -78,10 +78,19 @@ abstract class Generate
         return $this->name;
     }
 
+    /**
+     * @return string
+     */
     abstract public function generate();
 
+    /**
+     * @return string
+     */
     abstract public function skeleton();
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->generate();
