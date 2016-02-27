@@ -21,7 +21,7 @@ use FastD\Generator\Factory\Property;
 
 class GeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testBase()
+    /*public function testBase()
     {
         $generator = new Generator('Test', "Test");
 
@@ -52,5 +52,12 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
         $generator->setImplements([$interface]);
 
 //        echo $generator->output();
+    }*/
+
+    public function testUsage()
+    {
+        $generator = new Generator('Test5', "Test");
+
+        echo $generator->generate();
     }
 }

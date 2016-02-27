@@ -13,6 +13,7 @@
  */
 
 namespace FastD\Generator\Parser;
+use FastD\Generator\Factory\Object;
 
 /**
  * Class ObjectParse
@@ -47,12 +48,34 @@ class ObjectParse extends Parser implements ParserInterface
     protected $namespaces = [];
 
     /**
+     * @var array
+     */
+    protected $usages = [];
+
+    /**
      * ObjectParse constructor.
      * @param mixed $class
      */
     public function __construct($class)
     {
         parent::__construct(new \ReflectionClass($class));
+
+        $file = new \SplFileObject($this->reflector->getFileName());
+
+        $this->usages = [];
+
+        $i = 1;
+        $end = $this->reflector->getStartLine();
+        $file->seek($i);
+        while ($i < $end) {
+            $line = $file->current();
+            if ('use' === substr($line, 0, 3)) {
+                $this->usages[] = substr($line, 4, -2);
+            }
+            $file->next();
+            $i++;
+        }
+        unset($file);
     }
 
     /**
@@ -108,6 +131,14 @@ class ObjectParse extends Parser implements ParserInterface
         }
 
         return $this->methods;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUsages()
+    {
+        return $this->usages;
     }
 
     /**
@@ -205,30 +236,19 @@ class ObjectParse extends Parser implements ParserInterface
             $interfaces = '';
         }
 
-        $classType = $this->reflector->isAbstract() ? 'abstract class' : 'class';
-
-        $file = new \SplFileObject($this->reflector->getFileName());
-
         $usages = [];
 
-        $i = 1;
-        $end = $this->reflector->getStartLine();
-        $file->seek($i);
-        while ($i < $end) {
-            $line = $file->current();
-            if ('use' === substr($line, 0, 3)) {
-                $usages[] = $line;
-            }
-            $file->next();
-            $i++;
+        foreach ($this->usages as $usage) {
+            $usages[] = '\\' . $usage;
         }
-        unset($file);
 
         if (!empty($usages)) {
             $usages = implode(PHP_EOL, $usages);
         } else {
             $usages = '';
         }
+
+        $classType = $this->reflector->isAbstract() ? 'abstract class' : 'class';
 
         return <<<C
 {$namespace}

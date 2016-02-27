@@ -58,7 +58,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $parser = new ObjectParse('\\Test\\Test5');
 
-        echo $parser->getContent();
+//        echo $parser->getContent();
     }
 
     public function testMethods()
@@ -135,5 +135,12 @@ M
         $parameter = $method->getParameter('generator');
 
         $this->assertEquals($parameter->getContent(), 'FastD\Generator\Generator $generator = null');
+    }
+
+    public function testUsage()
+    {
+        $parser = new ObjectParse('\\Test\\Test5');
+
+        $this->assertEquals(['FastD\Generator\Generator'], $parser->getUsages());
     }
 }

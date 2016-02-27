@@ -27,10 +27,15 @@ class Generator extends Object implements GeneratorInterface
 {
     protected $parser;
 
-    public function __construct($name, $namespace = null, $type = null)
+    public function __construct($name, $namespace = null, $type = Object::OBJECT_CLASS)
     {
         try {
+            if (!empty($namespace)) {
+                $name = $namespace . '\\' . $name;
+            }
+            
             $this->parser = new ObjectParse($name);
+            $this->setUsages($this->parser->getUsages());
         } catch (\Exception $e) {}
 
         parent::__construct($name, $namespace, $type);

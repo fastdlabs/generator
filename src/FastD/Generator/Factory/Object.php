@@ -51,6 +51,11 @@ class Object extends Generate
     protected $interfaces = [];
 
     /**
+     * @var array
+     */
+    protected $usages = [];
+
+    /**
      * Object constructor.
      * @param $name
      * @param null $namespace
@@ -69,6 +74,25 @@ class Object extends Generate
     public function getNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * @param array $usages
+     * @return $this
+     */
+    public function setUsages(array $usages)
+    {
+        $this->usages = $usages;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUsages()
+    {
+        return $this->usages;
     }
 
     /**
@@ -188,10 +212,23 @@ class Object extends Generate
             $methods = '';
         }
 
-        $namespace = $this->namespace ? PHP_EOL . "namespace {$this->getNamespace()};" . PHP_EOL : '';
+        $usages = [];
+
+        foreach ($this->usages as $usage) {
+            $usages[] = 'use ' . $usage . ';';
+        }
+
+        if (!empty($usages)) {
+            $usages = PHP_EOL . implode(PHP_EOL, $usages) . PHP_EOL;
+        } else {
+            $usages = '';
+        }
+
+        $namespace = $this->namespace ? PHP_EOL . "namespace {$this->getNamespace()};" : '';
 
         return <<<M
 {$namespace}
+{$usages}
 {$this->getType()} {$this->getName()}{$this->getExtends()}{$interfaces}
 {{$properties}{$methods}
 }
