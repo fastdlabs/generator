@@ -29,6 +29,8 @@ class Generator extends Object implements GeneratorInterface
 
     public function __construct($name, $namespace = null, $type = Object::OBJECT_CLASS)
     {
+        $shortName = $name;
+
         try {
             if (!empty($namespace)) {
                 $name = $namespace . '\\' . $name;
@@ -38,10 +40,10 @@ class Generator extends Object implements GeneratorInterface
 
             $this->setUsages($this->parser->getUsages());
 
-            $name = $this->parser->getName();
+            $shortName = $this->parser->getName();
         } catch (\Exception $e) {}
 
-        parent::__construct($name, $namespace, $type);
+        parent::__construct($shortName, $namespace, $type);
     }
 
     /**
