@@ -201,17 +201,44 @@ class ObjectParse extends Parser implements ParserInterface
 
         if (!empty($interfaces)) {
             $interfaces = ' implements ' . implode(', ', $interfaces);
+        } else {
+            $interfaces = '';
+        }
+
+        $classType = $this->reflector->isAbstract() ? 'abstract class' : 'class';
+
+        $file = new \SplFileObject($this->reflector->getFileName());
+
+        $usages = [];
+
+        $i = 1;
+        $end = $this->reflector->getStartLine();
+        $file->seek($i);
+        while ($i < $end) {
+            $line = $file->current();
+            if ('use' === substr($line, 0, 3)) {
+                $usages[] = $line;
+            }
+            $file->next();
+            $i++;
+        }
+        unset($file);
+
+        if (!empty($usages)) {
+            $usages = implode(PHP_EOL, $usages);
+        } else {
+            $usages = '';
         }
 
         return <<<C
 {$namespace}
-class {$this->getName()}{$parent}{$interfaces}
+{$usages}
+{$classType} {$this->getName()}{$parent}{$interfaces}
 {
 {$constants}
 {$properties}
 {$methods}
 }
 C;
-
     }
 }
