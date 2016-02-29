@@ -63,11 +63,17 @@ class ObjectParse extends Parser implements ParserInterface
         }
 
         foreach ($this->reflector->getProperties() as $property) {
+            if ($property->getDeclaringClass()->getName() !== $this->reflector->getName()) {
+                continue;
+            }
             $properties[$property->getName()] = (new PropertyParser($this->reflector, $property->getName()))->getGenerator();
         }
 
         $methods = [];
         foreach ($this->reflector->getMethods() as $method) {
+            if ($method->getDeclaringClass()->getName() !== $this->reflector->getName()) {
+                continue;
+            }
             $methods[$method->getName()] = (new MethodParser($method))->getGenerator();
         }
 
