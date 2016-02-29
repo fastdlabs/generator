@@ -126,6 +126,8 @@ class Method extends Generate
         }
         $params = implode(', ', $params);
 
+        $todo = trim($this->getTodo());
+
         switch ($this->getType()) {
             case self::METHOD_INTERFACE:
                 return <<<M
@@ -141,7 +143,7 @@ M;
                 return <<<M
     {$this->getAccess()} {$this->getType()} function {$this->name}({$params})
     {
-        {$this->getTodo()}
+        {$todo}
     }
 M;
                 break;
@@ -150,7 +152,7 @@ M;
                 return <<<M
     {$this->getAccess()} function {$this->name}({$params})
     {
-        {$this->getTodo()}
+        {$todo}
     }
 M;
 
