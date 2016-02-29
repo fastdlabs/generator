@@ -83,11 +83,16 @@ class Generator implements GeneratorInterface
 
     /**
      * @param array Property[] $properties
+     * @param bool $flag
      * @return GeneratorInterface
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties, $flag = false)
     {
-        $this->object->appendProperties($properties);
+        if (!$flag) {
+            $this->object->appendProperties($properties);
+        } else {
+            $this->object->setProperties($properties);
+        }
 
         return $this;
     }
@@ -102,11 +107,16 @@ class Generator implements GeneratorInterface
 
     /**
      * @param array Method[] $methods
+     * @param bool $flag
      * @return GeneratorInterface
      */
-    public function setMethods(array $methods)
+    public function setMethods(array $methods, $flag = false)
     {
-        $this->object->appendMethods($methods);
+        if (!$flag) {
+            $this->object->appendMethods($methods);
+        } else {
+            $this->object->setMethods($methods);
+        }
 
         return $this;
     }
