@@ -118,6 +118,8 @@ class Property extends Generate
             } else {
                 $value = ' = ' . $value;
             }
+        } else {
+            $value = '';
         }
 
         if ($this->getAccess() == self::PROPERTY_CONST) {
