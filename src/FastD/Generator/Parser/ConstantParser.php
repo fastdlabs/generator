@@ -14,6 +14,9 @@
 
 namespace FastD\Generator\Parser;
 
+use FastD\Generator\Factory\Generate;
+use FastD\Generator\Factory\Property;
+
 /**
  * Class ConstantParser
  *
@@ -22,14 +25,9 @@ namespace FastD\Generator\Parser;
 class ConstantParser implements ParserInterface
 {
     /**
-     * @var string
+     * @var Property
      */
-    protected $name;
-
-    /**
-     * @var string|int
-     */
-    protected $value;
+    protected $generator;
 
     /**
      * ConstantParser constructor.
@@ -38,25 +36,9 @@ class ConstantParser implements ParserInterface
      */
     public function __construct($name, $value)
     {
-        $this->name = $name;
+        $this->generator = new Property($name, Property::PROPERTY_CONST);
 
-        $this->value = $value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getValue()
-    {
-        return $this->value;
+        $this->generator->setValue($value);
     }
 
     /**
@@ -64,10 +46,14 @@ class ConstantParser implements ParserInterface
      */
     public function getContent()
     {
-        $value = (is_integer($this->value) ? $this->value : '\'' . $this->value . '\'');
-        return <<<M
-    const {$this->name} = $value;
-M;
+        return $this->generator->generate();
+    }
 
+    /**
+     * @return Generate
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
     }
 }

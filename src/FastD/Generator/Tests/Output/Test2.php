@@ -16,7 +16,7 @@ namespace Test;
 
 use FastD\Generator\Generator;
 
-class Test2
+class Test2 extends Test implements TestInterface
 {
     const TESET = 'abc';
 
@@ -24,9 +24,8 @@ class Test2
 
     protected $default = 'jan';
 
-    /**
-     * @param Generator $generator
-     */
+    protected static $age = 18;
+
     public function test(Generator $generator, $name = 'test', $test = self::TESET, $four = 11)
     {}
 }

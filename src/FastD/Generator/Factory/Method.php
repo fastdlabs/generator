@@ -31,7 +31,7 @@ class Method extends Generate
     const METHOD_STATIC     = 'static';
 
     /**
-     * @var array
+     * @var Param[]
      */
     protected $params = [];
 
@@ -60,7 +60,7 @@ class Method extends Generate
     }
 
     /**
-     * @param array $params
+     * @param Param[] $params
      * @return $this
      */
     public function setParams(array $params)
@@ -71,7 +71,7 @@ class Method extends Generate
     }
 
     /**
-     * @return array
+     * @return Param[]
      */
     public function getParams()
     {
@@ -84,7 +84,9 @@ class Method extends Generate
      */
     public function setTodo($todo)
     {
-        $this->todo = $todo;
+        if (!empty($todo)) {
+            $this->todo = $todo;
+        }
 
         return $this;
     }
@@ -120,11 +122,7 @@ class Method extends Generate
     {
         $params = [];
         foreach ($this->params as $param) {
-            if ($param instanceof Object) {
-                $params[] = ltrim(implode('\\', [$param->getnamespace(), '$' . $param->getName()]), '\\');
-            } else {
-                $params[] = '$' . $param;
-            }
+            $params[] = $param->generate();
         }
         $params = implode(', ', $params);
 

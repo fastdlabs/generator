@@ -14,6 +14,13 @@
 
 namespace FastD\Generator\Parser;
 
+use FastD\Generator\Factory\Property;
+
+/**
+ * Class PropertyParser
+ *
+ * @package FastD\Generator\Parser
+ */
 class PropertyParser extends Parser implements ParserInterface
 {
     /**
@@ -21,62 +28,38 @@ class PropertyParser extends Parser implements ParserInterface
      */
     protected $reflector;
 
-    protected $name;
+    /**
+     * @var Property
+     */
+    protected $generator;
 
-    protected $value;
-
-    protected $accessible;
-
+    /**
+     * PropertyParser constructor.
+     * @param \ReflectionClass $reflectionClass
+     * @param $name
+     */
     public function __construct(\ReflectionClass $reflectionClass, $name)
     {
         $property = $reflectionClass->getProperty($name);
 
         parent::__construct($property);
 
-        $this->name = $property->getName();
-
         $property->setAccessible(true);
 
-        $this->value = $property->getValue($reflectionClass->newInstanceWithoutConstructor());
-
         if ($property->isPrivate()) {
-            $this->accessible = 'private';
+            $accessible = Property::PROPERTY_ACCESS_PRIVATE;
         } else if ($property->isProtected()) {
-            $this->accessible = 'protected';
+            $accessible = Property::PROPERTY_ACCESS_PROTECTED;
         } else {
-            $this->accessible = 'public';
-        }
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        $value = $this->getValue();
-
-        if (empty($value)) {
-            $value = '';
-        } else if (is_string($value)) {
-            $value = ' = \'' . $value . '\'';
-        } else {
-            $value = ' = ' . $value;
+            $accessible = Property::PROPERTY_ACCESS_PUBLIC;
         }
 
-        $static = $this->reflector->isStatic() ? ' static ' : '';
+        $this->generator = new Property($property->getName(), $accessible);
 
-        return <<<P
-    {$this->accessible}{$static} \${$this->name}{$value};
-P;
+        $this->generator->setValue($property->getValue($reflectionClass->newInstanceWithoutConstructor()));
+
+        if ($this->reflector->isStatic()) {
+            $this->generator->setStatic();
+        }
     }
 }

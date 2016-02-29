@@ -14,6 +14,8 @@
 
 namespace FastD\Generator\Parser;
 
+use FastD\Generator\Factory\Method;
+
 /**
  * Class MethodParser
  *
@@ -22,29 +24,9 @@ namespace FastD\Generator\Parser;
 class MethodParser extends Parser implements ParserInterface
 {
     /**
-     * @var ParamParser[]
-     */
-    protected $parameters = [];
-
-    /**
      * @var \ReflectionMethod
      */
     protected $reflector;
-
-    /**
-     * @var string
-     */
-    protected $accessible;
-
-    /**
-     * @var string
-     */
-    protected $abstract = '';
-
-    /**
-     * @var string
-     */
-    protected $todo = '';
 
     /**
      * MethodParser constructor.
@@ -54,19 +36,26 @@ class MethodParser extends Parser implements ParserInterface
     {
         parent::__construct($reflector);
 
+        $params = [];
         foreach ($this->reflector->getParameters() as $parameter) {
-            $this->parameters[$parameter->getName()] = new ParamParser($parameter);
+            $params[] = (new ParamParser($parameter))->getGenerator();
         }
 
         if ($this->reflector->isPrivate()) {
-            $this->accessible = 'private';
+            $accessible = Method::METHOD_ACCESS_PRIVATE;
         } else if ($this->reflector->isProtected()) {
-            $this->accessible = 'protected';
+            $accessible = Method::METHOD_ACCESS_PROTECTED;
         } else {
-            $this->accessible = 'public';
+            $accessible = Method::METHOD_ACCESS_PUBLIC;
         }
 
-        $this->abstract = $this->reflector->isAbstract() ? 'abstract ' : '';
+        if ($this->reflector->isAbstract()) {
+            $type = Method::METHOD_ABSTRACT;
+        } else {
+            $type = Method::METHOD_NULL;
+        }
+
+        $todo = '';
 
         if (empty($this->abstract)) {
             $file = new \SplFileObject($this->reflector->getFileName());
@@ -74,31 +63,23 @@ class MethodParser extends Parser implements ParserInterface
             $end =  $this->reflector->getEndLine();
             $file->seek($start);
             while ($start < $end) {
-                $this->todo .= $file->current();
+                $todo .= $file->current();
                 $file->next();
                 $start++;
             }
+            unset($file);
         } else {
-            $this->todo = ';';
+            $todo = ';';
         }
-        $this->todo = trim($this->todo);
-    }
 
-    /**
-     * @param $name
-     * @return ParamParser
-     */
-    public function getParameter($name)
-    {
-        return isset($this->parameters[$name]) ? $this->parameters[$name] : null;
-    }
+        $todo = trim($todo);
+        $todo = trim(trim($todo, '{'), '}');
 
-    /**
-     * @return ParamParser[]
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
+        $this->generator = new Method($this->reflector->getName(), $accessible, $type, $this->reflector->getDocComment());
+
+        $this->generator->setParams($params);
+
+        $this->generator->setTodo($todo);
     }
 
     /**
@@ -106,18 +87,6 @@ class MethodParser extends Parser implements ParserInterface
      */
     public function getContent()
     {
-        $parameters = [];
-
-        foreach ($this->parameters as $parameter) {
-            $parameters[] = $parameter->getContent();
-        }
-
-        $parameters = implode(', ', $parameters);
-
-        return <<<M
-    {$this->abstract}{$this->accessible} function {$this->reflector->getName()}($parameters)
-    {$this->todo}
-M;
-
+        return $this->generator->generate();
     }
 }

@@ -13,6 +13,7 @@
  */
 
 namespace FastD\Generator\Parser;
+
 use FastD\Generator\Factory\Object;
 
 /**
@@ -28,31 +29,6 @@ class ObjectParse extends Parser implements ParserInterface
     protected $reflector;
 
     /**
-     * @var MethodParser[]
-     */
-    protected $methods = [];
-
-    /**
-     * @var PropertyParser[]
-     */
-    protected $properties = [];
-
-    /**
-     * @var ConstantParser[]
-     */
-    protected $constants = [];
-
-    /**
-     * @var array
-     */
-    protected $namespaces = [];
-
-    /**
-     * @var array
-     */
-    protected $usages = [];
-
-    /**
      * ObjectParse constructor.
      * @param mixed $class
      */
@@ -62,7 +38,7 @@ class ObjectParse extends Parser implements ParserInterface
 
         $file = new \SplFileObject($this->reflector->getFileName());
 
-        $this->usages = [];
+        $usages = [];
 
         $i = 1;
         $end = $this->reflector->getStartLine();
@@ -70,195 +46,42 @@ class ObjectParse extends Parser implements ParserInterface
         while ($i < $end) {
             $line = $file->current();
             if ('use' === substr($line, 0, 3)) {
-                $this->usages[] = substr($line, 4, -2);
+                $usages[] = substr($line, 4, -2);
             }
             $file->next();
             $i++;
         }
         unset($file);
-    }
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->reflector->getShortName();
-    }
-
-    /**
-     * @return string
-     */
-    public function getNamespace()
-    {
-        return $this->reflector->getNamespaceName();
-    }
-
-    /**
-     * @return \ReflectionClass
-     */
-    public function getParent()
-    {
-        return $this->reflector->getParentClass();
-    }
-
-    /**
-     * @return array
-     */
-    public function getImplements()
-    {
-        return $this->reflector->getInterfaceNames();
-    }
-
-    /**
-     * @param $name
-     * @return MethodParser
-     */
-    public function getMethod($name)
-    {
-        return new MethodParser($this->reflector->getMethod($name));
-    }
-
-    /**
-     * @return MethodParser[]
-     */
-    public function getMethods()
-    {
-        if (empty($this->methods)) {
-            foreach ($this->reflector->getMethods() as $method) {
-                $this->methods[] = new MethodParser($method);
-            }
-        }
-
-        return $this->methods;
-    }
-
-    /**
-     * @return array
-     */
-    public function getUsages()
-    {
-        return $this->usages;
-    }
-
-    /**
-     * @param $name
-     * @return PropertyParser
-     */
-    public function getProperty($name)
-    {
-        return new PropertyParser($this->reflector, $name);
-    }
-
-    /**
-     * @return PropertyParser[]
-     */
-    public function getProperties()
-    {
-        if (empty($this->properties)) {
-            foreach ($this->reflector->getProperties() as $property) {
-                $this->properties[] = new PropertyParser($this->reflector, $property->getName());
-            }
-        }
-
-        return $this->properties;
-    }
-
-    /**
-     * @param $name
-     * @return ConstantParser
-     */
-    public function getConstant($name)
-    {
-        return new ConstantParser($name, $this->reflector->getConstant($name));
-    }
-
-    /**
-     * @return ConstantParser[]
-     */
-    public function getConstants()
-    {
-        if (empty($this->constants)) {
-            foreach ($this->reflector->getConstants() as $name => $value) {
-                $this->constants[] = new ConstantParser($name, $value);
-            }
-        }
-
-        return $this->constants;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        $constants = [];
-
-        foreach ($this->getConstants() as $constant) {
-            $constants[] = $constant->getContent();
-        }
-
-        $constants = implode(PHP_EOL, $constants);
+        $this->generator = new Object($this->reflector->getShortName(), $this->reflector->getNamespaceName());
+        $this->generator->setUsages($usages);
 
         $properties = [];
 
-        foreach ($this->getProperties() as $property) {
-            $properties[] = $property->getContent();
+        foreach ($this->reflector->getConstants() as $name => $value) {
+            $properties[$name] = (new ConstantParser($name, $value))->getGenerator();
         }
 
-        $properties = implode(PHP_EOL, $properties);
+        foreach ($this->reflector->getProperties() as $property) {
+            $properties[$property->getName()] = (new PropertyParser($this->reflector, $property->getName()))->getGenerator();
+        }
 
         $methods = [];
-
-        foreach ($this->getMethods() as $method) {
-            $methods[] = $method->getContent();
+        foreach ($this->reflector->getMethods() as $method) {
+            $methods[$method->getName()] = (new MethodParser($method))->getGenerator();
         }
 
-        $methods = implode(PHP_EOL, $methods);
-
-        $namespace = empty($this->getNamespace()) ? '' : 'namespace ' . $this->getNamespace() . ';' . PHP_EOL;
-
-        $parent = '';
-
-        if ($this->getParent()) {
-            $parent = ' extends ' . '\\' . $this->getParent()->getName();
-        }
+        $this->generator->setProperties($properties);
+        $this->generator->setMethods($methods);
 
         $interfaces = [];
-
-        foreach ($this->getImplements() as $implement) {
-            $interfaces[] = '\\' . $implement;
+        foreach ($this->reflector->getInterfaces() as $interface) {
+            $interfaces[$interface->getShortName()] = new Object($interface->getShortName(), $interface->getNamespaceName(), Object::OBJECT_INTERFACE);
         }
+        $this->generator->setImplements($interfaces);
 
-        if (!empty($interfaces)) {
-            $interfaces = ' implements ' . implode(', ', $interfaces);
-        } else {
-            $interfaces = '';
+        if (false !== ($parent = $this->reflector->getParentClass())) {
+            $this->generator->setExtends(new Object($parent->getShortName(), $parent->getNamespaceName(), Object::OBJECT_CLASS));
         }
-
-        $usages = [];
-
-        foreach ($this->usages as $usage) {
-            $usages[] = '\\' . $usage;
-        }
-
-        if (!empty($usages)) {
-            $usages = implode(PHP_EOL, $usages);
-        } else {
-            $usages = '';
-        }
-
-        $classType = $this->reflector->isAbstract() ? 'abstract class' : 'class';
-
-        return <<<C
-{$namespace}
-{$usages}
-{$classType} {$this->getName()}{$parent}{$interfaces}
-{
-{$constants}
-{$properties}
-{$methods}
-}
-C;
     }
 }

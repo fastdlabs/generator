@@ -13,6 +13,7 @@
  */
 
 namespace FastD\Generator\Parser;
+use FastD\Generator\Factory\Param;
 
 /**
  * Class ParamParser
@@ -27,21 +28,6 @@ class ParamParser extends Parser implements ParserInterface
     protected $reflector;
 
     /**
-     * @var string
-     */
-    protected $class;
-
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $value;
-
-    /**
      * ParamParser constructor.
      * @param \ReflectionParameter $reflector
      */
@@ -49,35 +35,23 @@ class ParamParser extends Parser implements ParserInterface
     {
         parent::__construct($reflector);
 
-        $this->name = $reflector->getName();
+        $name = $reflector->getName();
+        $class = '';
 
         if ($reflector->getClass()) {
-            $this->class = $reflector->getClass()->getName() . ' ';
+            $class = $reflector->getClass()->getName();
         }
 
         if ($reflector->isDefaultValueAvailable()) {
             if ($reflector->isDefaultValueConstant()) {
-                $this->value = ' = ' . $reflector->getDefaultValueConstantName();
+                $value = $reflector->getDefaultValueConstantName();
             } else {
-                if (null === $reflector->getDefaultValue()) {
-                    $this->value = ' = null';
-                } else {
-                    $value = $reflector->getDefaultValue();
-                    if (is_integer($value)) {
-                        $this->value = ' = ' . $value;
-                    } else {
-                        $this->value = ' = \'' . $value . '\'';
-                    }
-                }
+                $value = $reflector->getDefaultValue();
             }
+        } else {
+            $value = Param::PARAM_NONE;
         }
-    }
 
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->class . '$' . $this->name . $this->value;
+        $this->generator = new Param($name, $class, $value);
     }
 }

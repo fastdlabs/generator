@@ -23,41 +23,51 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 {
     public function testBase()
     {
-        $generator = new Generator('Test', "Test");
+        $generator = new Generator('Test2', "Test");
 
-//        echo $generator->output();
+        $generator->setMethods([
+            'test2' => new Method('test2'),
+        ]);
+
+        $this->assertEquals(<<<M
+
+namespace Test;
+
+use FastD\Generator\Generator;
+
+class Test2 extends \Test\Test implements \Test\TestInterface
+{
+    /**
+     * @const mixed
+     */
+    const TESET = 'abc';
+
+    /**
+     * @var mixed
+     */
+    protected \$name;
+
+    /**
+     * @var mixed
+     */
+    protected \$default = 'jan';
+
+    /**
+     * @var mixed
+     */
+    protected static \$age = '18';
+
+    public function test(\FastD\Generator\Generator \$generator, \$name = 'test', \$test = 'self::TESET', \$four = 11)
+    {
+        // TODO...
     }
 
-    public function testExtends()
+    public function test2()
     {
-        $generator = new Generator('Test', "Test");
-
-        $ext = new Object('Base', "Base");
-
-        $generator->setExtends($ext);
-
-//        echo $generator->output();
+        // TODO...
     }
-
-    public function testImplements()
-    {
-        $generator = new Generator('Test', "Test");
-
-        $ext = new Object('Base', "Base");
-
-        $generator->setExtends($ext);
-
-        $interface = new Object('BI', 'Bi');
-
-        $generator->setImplements([$interface]);
-
-//        echo $generator->output();
-    }
-
-    public function testUsage()
-    {
-        $generator = new Generator('Test5', "Test");
-
-        echo $generator->generate();
+}
+M
+, $generator->output(false));
     }
 }

@@ -106,28 +106,35 @@ class Property extends Generate
      */
     public function skeleton()
     {
+        $value = $this->getValue();
+
+        if (!empty($value)) {
+            if (is_array($value)) {
+                $value = ' = ' . var_export($value, true);
+            } else if (false === strpos($value, '::')) {
+                $value = " = '{$value}'";
+            } else if (is_string($value)) {
+                $value = ' = \'' . $value . '\'';
+            } else {
+                $value = ' = ' . $value;
+            }
+        }
+
         if ($this->getAccess() == self::PROPERTY_CONST) {
             $name = strtoupper($this->name);
-            $value = $this->getValue() ? $this->getValue() : 'null';
-
-            if (is_array($value)) {
-                $value = var_export($value, true);
-            } else if (false === strpos($value, '::')) {
-                $value = "'{$value}'";
-            }
-
+            $value = empty($value) ? ' = null' : $value;
             return <<<M
     /**
      * @const {$this->getType()}
      */
-    {$this->getAccess()} {$name} = {$value};
+    {$this->getAccess()} {$name}{$value};
 M;
         }
         return <<<M
-    /*
+    /**
      * @var {$this->getType()}
      */
-    {$this->getAccess()} {$this->static}\${$this->name};
+    {$this->getAccess()} {$this->static}\${$this->name}{$value};
 M;
     }
 }

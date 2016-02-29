@@ -14,6 +14,8 @@
 
 namespace FastD\Generator\Parser;
 
+use FastD\Generator\Factory\Generate;
+
 /**
  * Interface ParserInterface
  * @package FastD\Generator\Parser
@@ -24,4 +26,9 @@ interface ParserInterface
      * @return string
      */
     public function getContent();
+
+    /**
+     * @return Generate
+     */
+    public function getGenerator();
 }

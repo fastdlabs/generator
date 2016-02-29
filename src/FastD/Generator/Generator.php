@@ -14,7 +14,8 @@
 
 namespace FastD\Generator;
 
-use FastD\Generator\Parser\Parser;
+use FastD\Generator\Factory\Method;
+use FastD\Generator\Factory\Property;
 use FastD\Generator\Parser\ObjectParse;
 use FastD\Generator\Factory\Object;
 
@@ -23,27 +24,30 @@ use FastD\Generator\Factory\Object;
  *
  * @package FastD\Generator
  */
-class Generator extends Object implements GeneratorInterface
+class Generator implements GeneratorInterface
 {
-    protected $parser;
+    /**
+     * @var Object
+     */
+    protected $object;
 
+    /**
+     * Generator constructor.
+     * @param $name
+     * @param null $namespace
+     * @param string $type
+     */
     public function __construct($name, $namespace = null, $type = Object::OBJECT_CLASS)
     {
-        $shortName = $name;
-
         try {
             if (!empty($namespace)) {
                 $name = $namespace . '\\' . $name;
             }
-            
-            $this->parser = new ObjectParse($name);
 
-            $this->setUsages($this->parser->getUsages());
-
-            $shortName = $this->parser->getName();
-        } catch (\Exception $e) {}
-
-        parent::__construct($shortName, $namespace, $type);
+            $this->object = (new ObjectParse($name))->getGenerator();
+        } catch (\Exception $e) {
+            $this->object = new Object($name, $namespace, $type);
+        }
     }
 
     /**
@@ -52,13 +56,11 @@ class Generator extends Object implements GeneratorInterface
      */
     public function output($output = true)
     {
-        $str = $this->generate();
-
         if (!$output) {
-            return $str;
+            return $this->object->generate();
         }
 
-        echo $str;
+        echo $this->object->generate();
     }
 
     /**
@@ -71,10 +73,48 @@ class Generator extends Object implements GeneratorInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getParser()
+    public function getNamespace()
     {
-        return $this->parser;
+        return $this->object->getNamespace();
+    }
+
+    /**
+     * @param array Property[] $properties
+     * @return GeneratorInterface
+     */
+    public function setProperties(array $properties)
+    {
+        $this->object->appendProperties($properties);
+
+        return $this;
+    }
+
+    /**
+     * @return Property[]
+     */
+    public function getProperties()
+    {
+        return $this->object->getProperties();
+    }
+
+    /**
+     * @param array Method[] $methods
+     * @return GeneratorInterface
+     */
+    public function setMethods(array $methods)
+    {
+        $this->object->appendMethods($methods);
+
+        return $this;
+    }
+
+    /**
+     * @return Method[]
+     */
+    public function getMethods()
+    {
+        return $this->object->getMethods();
     }
 }

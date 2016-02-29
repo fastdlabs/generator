@@ -61,9 +61,4 @@ interface GeneratorInterface
      * @return int
      */
     public function save($file);
-
-    /**
-     * @return mixed
-     */
-    public function getParser();
 }

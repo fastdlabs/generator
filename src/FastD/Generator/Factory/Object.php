@@ -111,11 +111,22 @@ class Object extends Generate
      */
     public function getExtends()
     {
-        return null === $this->extend ? '' : ' extends \\' . str_replace('\\\\', '\\', implode('\\', [$this->extend->getNamespace(), $this->extend->getName()]));
+        return $this->extend;
     }
 
     /**
-     * @param array $interfaces
+     * @param Object[] $interfaces
+     * @return $this
+     */
+    public function appendImplements(array $interfaces)
+    {
+        $this->interfaces = array_merge($this->interfaces, $interfaces);
+
+        return $this;
+    }
+
+    /**
+     * @param Object[] $interfaces
      * @return $this
      */
     public function setImplements(array $interfaces)
@@ -134,7 +145,18 @@ class Object extends Generate
     }
 
     /**
-     * @param array $properties
+     * @param Property[] $properties
+     * @return $this
+     */
+    public function appendProperties(array $properties)
+    {
+        $this->properties = array_merge($this->properties, $properties);
+
+        return $this;
+    }
+
+    /**
+     * @param Property[] $properties
      * @return $this
      */
     public function setProperties(array $properties)
@@ -153,7 +175,18 @@ class Object extends Generate
     }
 
     /**
-     * @param array $methods
+     * @param Method[] $methods
+     * @return $this
+     */
+    public function appendMethods(array $methods)
+    {
+        $this->methods = array_merge($this->methods, $methods);
+
+        return $this;
+    }
+
+    /**
+     * @param Method[] $methods
      * @return $this
      */
     public function setMethods(array $methods)
@@ -176,6 +209,7 @@ class Object extends Generate
      */
     public function generate()
     {
+        // property
         $properties = [];
 
         foreach ($this->properties as $property) {
@@ -183,15 +217,19 @@ class Object extends Generate
         }
 
         if (!empty($properties)) {
-            $properties = PHP_EOL . implode(PHP_EOL, $properties) . PHP_EOL;
+            $properties = PHP_EOL . implode(PHP_EOL . PHP_EOL, $properties) . PHP_EOL;
         } else {
             $properties = '';
         }
 
+        // extend
+        $extend = null === $this->getExtends() ? '' : ' extends ' . str_replace('\\\\', '\\', '\\' . implode('\\', [$this->extend->getNamespace(), $this->extend->getName()]));
+
+        // implements
         $interfaces = [];
 
         foreach ($this->interfaces as $interface) {
-            $interfaces[] = '\\' . str_replace('\\\\', '\\', implode('\\', [$interface->getNamespace(), $interface->getName()]));
+            $interfaces[] = str_replace('\\\\', '\\', '\\' . implode('\\', [$interface->getNamespace(), $interface->getName()]));
         }
 
         if (!empty($interfaces)) {
@@ -200,6 +238,7 @@ class Object extends Generate
             $interfaces = '';
         }
 
+        // methods
         $methods = [];
 
         foreach ($this->methods as $method) {
@@ -207,11 +246,13 @@ class Object extends Generate
         }
 
         if (!empty($methods)) {
-            $methods = PHP_EOL . implode(PHP_EOL, $methods) . PHP_EOL;
+            $methods = PHP_EOL . implode(PHP_EOL . PHP_EOL, $methods) . PHP_EOL;
         } else {
             $methods = '';
         }
+        $methods = rtrim($methods);
 
+        // use
         $usages = [];
 
         foreach ($this->usages as $usage) {
@@ -224,12 +265,13 @@ class Object extends Generate
             $usages = '';
         }
 
+        // namespace
         $namespace = $this->namespace ? PHP_EOL . "namespace {$this->getNamespace()};" : '';
 
         return <<<M
 {$namespace}
 {$usages}
-{$this->getType()} {$this->getName()}{$this->getExtends()}{$interfaces}
+{$this->getType()} {$this->getName()}{$extend}{$interfaces}
 {{$properties}{$methods}
 }
 M;

@@ -14,6 +14,8 @@
 
 namespace FastD\Generator\Parser;
 
+use FastD\Generator\Factory\Generate;
+
 /**
  * Class Parser
  *
@@ -25,6 +27,11 @@ abstract class Parser implements ParserInterface
      * @var \Reflector
      */
     protected $reflector;
+
+    /**
+     * @var Generate
+     */
+    protected $generator;
 
     /**
      * Parser constructor.
@@ -50,6 +57,22 @@ abstract class Parser implements ParserInterface
         }
 
         return $name;
+    }
+
+    /**
+     * @return Generate
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->generator->generate();
     }
 
     /**
