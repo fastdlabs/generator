@@ -39,14 +39,15 @@ class Generator implements GeneratorInterface
      */
     public function __construct($name, $namespace = null, $type = Object::OBJECT_CLASS)
     {
+        $shortName = $name;
+
         try {
             if (!empty($namespace)) {
                 $name = $namespace . '\\' . $name;
             }
-
             $this->object = (new ObjectParse($name))->getGenerator();
         } catch (\Exception $e) {
-            $this->object = new Object($name, $namespace, $type);
+            $this->object = new Object($shortName, $namespace, $type);
         }
     }
 
