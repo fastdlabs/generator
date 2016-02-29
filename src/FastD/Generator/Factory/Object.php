@@ -96,10 +96,10 @@ class Object extends Generate
     }
 
     /**
-     * @param self $object
+     * @param Object $object
      * @return $this
      */
-    public function setExtends(self $object)
+    public function setExtends(Object $object)
     {
         $this->extend = $object;
 

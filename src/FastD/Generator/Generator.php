@@ -117,4 +117,23 @@ class Generator implements GeneratorInterface
     {
         return $this->object->getMethods();
     }
+
+    /**
+     * @param Object $object
+     * @return $this
+     */
+    public function setExtends(Object $object)
+    {
+        $this->object->setExtends($object);
+
+        return $this;
+    }
+
+    /**
+     * @return Object
+     */
+    public function getExtends()
+    {
+        return $this->object->getExtends();
+    }
 }
