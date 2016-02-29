@@ -55,7 +55,7 @@ class Test2 extends \Test\Test implements \Test\TestInterface
     /**
      * @var mixed
      */
-    protected static \$age = '18';
+    protected static \$age = 18;
 
     public function test(\FastD\Generator\Generator \$generator, \$name = 'test', \$test = 'self::TESET', \$four = 11)
     {

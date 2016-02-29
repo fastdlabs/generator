@@ -32,7 +32,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
      */
     protected \$name;
 M
-);
+        );
 
         $name = new Property('name', Property::PROPERTY_ACCESS_PRIVATE);
 
@@ -75,6 +75,18 @@ M
     protected static \$name;
 M
         );
+
+        $name = new Property('name', Property::PROPERTY_ACCESS_PROTECTED, 'string');
+
+        $name->setValue('\Test::NAME');
+
+        $this->assertEquals(<<<M
+    /**
+     * @var string
+     */
+    protected \$name = \Test::NAME;
+M
+            , $name->generate());
     }
 
     public function testMethod()

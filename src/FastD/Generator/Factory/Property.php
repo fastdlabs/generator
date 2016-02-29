@@ -111,8 +111,8 @@ class Property extends Generate
         if (!empty($value)) {
             if (is_array($value)) {
                 $value = ' = ' . var_export($value, true);
-            } else if (false === strpos($value, '::')) {
-                $value = " = '{$value}'";
+            } else if (false !== strpos($value, '::')) {
+                $value = " = {$value}";
             } else if (is_string($value)) {
                 $value = ' = \'' . $value . '\'';
             } else {
