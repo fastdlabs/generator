@@ -70,6 +70,10 @@ class Generator implements GeneratorInterface
      */
     public function save($file)
     {
+        if (!file_exists(dirname($file))) {
+            mkdir(dirname($file), 0755, true);
+        }
+
         return file_put_contents($file, '<?php' . PHP_EOL . $this->output(false));
     }
 

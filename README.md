@@ -2,33 +2,43 @@
 
 一个写了好像没什么用的东西, 主要辅助命令行等其他工具做一个自动生成的工作.
 
+## 要求
+
+php >= 7
+
+## composer
+
+```json
+{
+    "fastd/generator": "~1.0"
+}
+```
+
 ## 生成对象
 
 ```php
 // include composer
-$generator = new Generator('Test', "Test");
-echo $generator->generate();
+$generator = new \FastD\Generator\Generator('Test');
+echo $generator->output();
 ```
 
-生成一个对象, 此处是个字符穿, 具体操作由具体业务处理.
+`FastD\Generator\Generator` 构造方法接受三个参数，第一个是类名，第二个是命名空间，第三个是对象类型: 普通对象，抽象类，接口，可以通过 `FastD\Generator\Factory\Object::OBJECT_CLASS`, `FastD\Generator\Factory\Object::OBJECT_ABSTRACT`, `FastD\Generator\Factory\Object::OBJECT_INTERFACE` 分别控制.
 
-## Api
+具体请看: Testing
 
-### FastD\Generator\Factory\Object::__construct($name, $namespace = null, $type = self::OBJECT_CLASS)
+### 输出
 
-#### name
+```php
+class Test { }
+```
 
-&emsp;&emsp;要生成的类名
+### 生成文件
 
-#### namespace
-
-&emsp;&emsp;要生成的命名空间
-
-#### type
-
-$emsp;&emsp;要生成的对象类型, OBJECT_CLASS, OBJECT_ABSTRACT, OBJECT_INTERFACE
-
-### FastD\Generator\Factory\Object::generate()
+```php
+// include composer
+$generator = new \FastD\Generator\Generator('Test');
+echo $generator->save(__DIR__ . '/save/Test.php');
+```
 
 &emsp;&emsp;返回生成的最终信息
 
