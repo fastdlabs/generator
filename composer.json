@@ -19,6 +19,11 @@
             "FastD\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\": "src/Generator/Tests/Output"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"
