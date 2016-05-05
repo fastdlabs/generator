@@ -175,6 +175,15 @@ class Object extends Generate
     }
 
     /**
+     * @param $name
+     * @return Property|null
+     */
+    public function getProperty($name)
+    {
+        return isset($this->properties[$name]) ? $this->properties[$name] : null;
+    }
+
+    /**
      * @param Method[] $methods
      * @return $this
      */
@@ -202,6 +211,15 @@ class Object extends Generate
     public function getMethods()
     {
         return $this->methods;
+    }
+
+    /**
+     * @param $name
+     * @return Method|null
+     */
+    public function getMethod($name)
+    {
+        return isset($this->methods[$name]) ? $this->methods[$name] : null;
     }
 
     /**

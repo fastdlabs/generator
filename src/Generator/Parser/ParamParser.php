@@ -52,6 +52,6 @@ class ParamParser extends Parser implements ParserInterface
             $value = Param::PARAM_NONE;
         }
 
-        $this->generator = new Param($name, $class, $value);
+        $this->factory = new Param($name, $class, $value);
     }
 }

@@ -53,8 +53,8 @@ class ObjectParse extends Parser implements ParserInterface
         }
         unset($file);
 
-        $this->generator = new Object($this->reflector->getShortName(), $this->reflector->getNamespaceName());
-        $this->generator->setUsages($usages);
+        $this->factory = new Object($this->reflector->getShortName(), $this->reflector->getNamespaceName());
+        $this->factory->setUsages($usages);
 
         $properties = [];
 
@@ -77,17 +77,17 @@ class ObjectParse extends Parser implements ParserInterface
             $methods[$method->getName()] = (new MethodParser($method))->getGenerator();
         }
 
-        $this->generator->setProperties($properties);
-        $this->generator->setMethods($methods);
+        $this->factory->setProperties($properties);
+        $this->factory->setMethods($methods);
 
         $interfaces = [];
         foreach ($this->reflector->getInterfaces() as $interface) {
             $interfaces[$interface->getShortName()] = new Object($interface->getShortName(), $interface->getNamespaceName(), Object::OBJECT_INTERFACE);
         }
-        $this->generator->setImplements($interfaces);
+        $this->factory->setImplements($interfaces);
 
         if (false !== ($parent = $this->reflector->getParentClass())) {
-            $this->generator->setExtends(new Object($parent->getShortName(), $parent->getNamespaceName(), Object::OBJECT_CLASS));
+            $this->factory->setExtends(new Object($parent->getShortName(), $parent->getNamespaceName(), Object::OBJECT_CLASS));
         }
     }
 }

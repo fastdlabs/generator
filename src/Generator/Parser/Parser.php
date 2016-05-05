@@ -31,7 +31,7 @@ abstract class Parser implements ParserInterface
     /**
      * @var Generate
      */
-    protected $generator;
+    protected $factory;
 
     /**
      * Parser constructor.
@@ -64,7 +64,7 @@ abstract class Parser implements ParserInterface
      */
     public function getGenerator()
     {
-        return $this->generator;
+        return $this->factory;
     }
 
     /**
@@ -72,7 +72,7 @@ abstract class Parser implements ParserInterface
      */
     public function getContent()
     {
-        return $this->generator->generate();
+        return $this->factory->generate();
     }
 
     /**

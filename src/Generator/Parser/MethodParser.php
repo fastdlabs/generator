@@ -75,11 +75,11 @@ class MethodParser extends Parser implements ParserInterface
         $todo = trim($todo);
         $todo = trim(trim($todo, '{'), '}');
 
-        $this->generator = new Method($this->reflector->getName(), $accessible, $type, $this->reflector->getDocComment());
+        $this->factory = new Method($this->reflector->getName(), $accessible, $type, $this->reflector->getDocComment());
 
-        $this->generator->setParams($params);
+        $this->factory->setParams($params);
 
-        $this->generator->setTodo($todo);
+        $this->factory->setTodo($todo);
     }
 
     /**
@@ -87,6 +87,6 @@ class MethodParser extends Parser implements ParserInterface
      */
     public function getContent()
     {
-        return $this->generator->generate();
+        return $this->factory->generate();
     }
 }

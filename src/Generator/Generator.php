@@ -27,7 +27,7 @@ use FastD\Generator\Factory\Object;
 class Generator implements GeneratorInterface
 {
     /**
-     * @var Object
+     * @var Object|Object
      */
     protected $object;
 
@@ -62,6 +62,8 @@ class Generator implements GeneratorInterface
         }
 
         echo $this->object->generate();
+
+        return 0;
     }
 
     /**
@@ -150,5 +152,13 @@ class Generator implements GeneratorInterface
     public function getExtends()
     {
         return $this->object->getExtends();
+    }
+
+    /**
+     * @return Object|Object
+     */
+    public function getObject()
+    {
+        return $this->object;
     }
 }

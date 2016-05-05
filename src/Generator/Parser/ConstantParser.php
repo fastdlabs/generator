@@ -27,7 +27,7 @@ class ConstantParser implements ParserInterface
     /**
      * @var Property
      */
-    protected $generator;
+    protected $factory;
 
     /**
      * ConstantParser constructor.
@@ -36,9 +36,9 @@ class ConstantParser implements ParserInterface
      */
     public function __construct($name, $value)
     {
-        $this->generator = new Property($name, Property::PROPERTY_CONST);
+        $this->factory = new Property($name, Property::PROPERTY_CONST);
 
-        $this->generator->setValue($value);
+        $this->factory->setValue($value);
     }
 
     /**
@@ -46,7 +46,7 @@ class ConstantParser implements ParserInterface
      */
     public function getContent()
     {
-        return $this->generator->generate();
+        return $this->factory->generate();
     }
 
     /**
@@ -54,6 +54,6 @@ class ConstantParser implements ParserInterface
      */
     public function getGenerator()
     {
-        return $this->generator;
+        return $this->factory;
     }
 }

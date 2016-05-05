@@ -29,11 +29,6 @@ class PropertyParser extends Parser implements ParserInterface
     protected $reflector;
 
     /**
-     * @var Property
-     */
-    protected $generator;
-
-    /**
      * PropertyParser constructor.
      * @param \ReflectionClass $reflectionClass
      * @param $name
@@ -54,12 +49,12 @@ class PropertyParser extends Parser implements ParserInterface
             $accessible = Property::PROPERTY_ACCESS_PUBLIC;
         }
 
-        $this->generator = new Property($property->getName(), $accessible);
+        $this->factory = new Property($property->getName(), $accessible);
 
-        $this->generator->setValue($property->getValue($reflectionClass->newInstanceWithoutConstructor()));
+        $this->factory->setValue($property->getValue($reflectionClass->newInstanceWithoutConstructor()));
 
         if ($this->reflector->isStatic()) {
-            $this->generator->setStatic();
+            $this->factory->setStatic();
         }
     }
 }
