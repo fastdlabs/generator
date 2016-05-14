@@ -16,7 +16,7 @@ namespace FastD\Generator;
 
 use FastD\Generator\Factory\GetSetter;
 use FastD\Generator\Factory\Method;
-use FastD\Generator\Factory\Object;
+use FastD\Generator\Factory\Obj;
 use FastD\Generator\Factory\Param;
 use FastD\Generator\Factory\Property;
 
@@ -243,16 +243,16 @@ M
 
     public function testObject()
     {
-        $object = new Object('Test', "Test");
+        $object = new Obj('Test', "Test");
 
         $object->setProperties([
             new Property('name', Property::PROPERTY_ACCESS_PROTECTED, 'string')
         ]);
 
-        $object->setExtends(new Object('FileInfo'));
+        $object->setExtends(new Obj('FileInfo'));
 
         $object->setImplements([
-            new Object('Iterator'),
+            new Obj('Iterator'),
         ]);
 
         $object->setMethods([

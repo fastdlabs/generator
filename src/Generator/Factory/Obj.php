@@ -15,11 +15,11 @@
 namespace FastD\Generator\Factory;
 
 /**
- * Class Object
+ * Class Obj
  *
  * @package FastD\Generator\Factory
  */
-class Object extends Generate
+class Obj extends Generate
 {
     const OBJECT_CLASS = 'class';
     const OBJECT_ABSTRACT = 'abstract class';
@@ -56,7 +56,7 @@ class Object extends Generate
     protected $usages = [];
 
     /**
-     * Object constructor.
+     * Obj constructor.
      * @param $name
      * @param null $namespace
      * @param string $type
@@ -96,10 +96,10 @@ class Object extends Generate
     }
 
     /**
-     * @param Object $object
+     * @param Obj $object
      * @return $this
      */
-    public function setExtends(Object $object)
+    public function setExtends(Obj $object)
     {
         $this->extend = $object;
 
@@ -115,7 +115,7 @@ class Object extends Generate
     }
 
     /**
-     * @param Object[] $interfaces
+     * @param Obj[] $interfaces
      * @return $this
      */
     public function appendImplements(array $interfaces)
@@ -126,7 +126,7 @@ class Object extends Generate
     }
 
     /**
-     * @param Object[] $interfaces
+     * @param Obj[] $interfaces
      * @return $this
      */
     public function setImplements(array $interfaces)
@@ -137,7 +137,7 @@ class Object extends Generate
     }
 
     /**
-     * @return Object[]
+     * @return Obj[]
      */
     public function getImplements()
     {

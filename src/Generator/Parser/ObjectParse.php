@@ -14,7 +14,7 @@
 
 namespace FastD\Generator\Parser;
 
-use FastD\Generator\Factory\Object;
+use FastD\Generator\Factory\Obj;
 
 /**
  * Class ObjectParse
@@ -53,7 +53,7 @@ class ObjectParse extends Parser implements ParserInterface
         }
         unset($file);
 
-        $this->factory = new Object($this->reflector->getShortName(), $this->reflector->getNamespaceName());
+        $this->factory = new Obj($this->reflector->getShortName(), $this->reflector->getNamespaceName());
         $this->factory->setUsages($usages);
 
         $properties = [];
@@ -82,12 +82,12 @@ class ObjectParse extends Parser implements ParserInterface
 
         $interfaces = [];
         foreach ($this->reflector->getInterfaces() as $interface) {
-            $interfaces[$interface->getShortName()] = new Object($interface->getShortName(), $interface->getNamespaceName(), Object::OBJECT_INTERFACE);
+            $interfaces[$interface->getShortName()] = new Obj($interface->getShortName(), $interface->getNamespaceName(), Obj::OBJECT_INTERFACE);
         }
         $this->factory->setImplements($interfaces);
 
         if (false !== ($parent = $this->reflector->getParentClass())) {
-            $this->factory->setExtends(new Object($parent->getShortName(), $parent->getNamespaceName(), Object::OBJECT_CLASS));
+            $this->factory->setExtends(new Obj($parent->getShortName(), $parent->getNamespaceName(), Obj::OBJECT_CLASS));
         }
     }
 }

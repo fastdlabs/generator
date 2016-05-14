@@ -17,7 +17,7 @@ namespace FastD\Generator;
 use FastD\Generator\Factory\Method;
 use FastD\Generator\Factory\Property;
 use FastD\Generator\Parser\ObjectParse;
-use FastD\Generator\Factory\Object;
+use FastD\Generator\Factory\Obj;
 
 /**
  * Class Generator
@@ -37,7 +37,7 @@ class Generator implements GeneratorInterface
      * @param null $namespace
      * @param string $type
      */
-    public function __construct($name, $namespace = null, $type = Object::OBJECT_CLASS)
+    public function __construct($name, $namespace = null, $type = Obj::OBJECT_CLASS)
     {
         $shortName = $name;
 
@@ -47,7 +47,7 @@ class Generator implements GeneratorInterface
             }
             $this->object = (new ObjectParse($name))->getGenerator();
         } catch (\Exception $e) {
-            $this->object = new Object($shortName, $namespace, $type);
+            $this->object = new Obj($shortName, $namespace, $type);
         }
     }
 
@@ -136,10 +136,10 @@ class Generator implements GeneratorInterface
     }
 
     /**
-     * @param Object $object
+     * @param Obj $object
      * @return $this
      */
-    public function setExtends(Object $object)
+    public function setExtends(Obj $object)
     {
         $this->object->setExtends($object);
 

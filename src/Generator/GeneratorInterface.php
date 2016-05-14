@@ -15,7 +15,7 @@
 namespace FastD\Generator;
 
 use FastD\Generator\Factory\Method;
-use FastD\Generator\Factory\Object;
+use FastD\Generator\Factory\Obj;
 use FastD\Generator\Factory\Property;
 
 /**
@@ -28,7 +28,7 @@ interface GeneratorInterface
      * @param Object $object
      * @return $this
      */
-    public function setExtends(Object $object);
+    public function setExtends(Obj $object);
 
     /**
      * @return Object
