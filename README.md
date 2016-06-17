@@ -10,7 +10,7 @@ php >= 7
 
 ```json
 {
-    "fastd/generator": "~1.0"
+    "fastd/generator": "~1.1.0"
 }
 ```
 
