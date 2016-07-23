@@ -14,9 +14,22 @@
 
 namespace FastD\Generator;
 
+/**
+ * Interface CombinationInterface
+ *
+ * @package FastD\Generator
+ */
 interface CombinationInterface
 {
+    /**
+     * @param $class
+     * @return mixed
+     */
     public function appendClass($class);
 
+    /**
+     * @param array $classes
+     * @return mixed
+     */
     public function combination(array $classes);
 }

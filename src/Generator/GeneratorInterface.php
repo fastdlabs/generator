@@ -25,7 +25,7 @@ use FastD\Generator\Factory\Property;
 interface GeneratorInterface
 {
     /**
-     * @param Object $object
+     * @param Obj $object
      * @return $this
      */
     public function setExtends(Obj $object);

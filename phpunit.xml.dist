@@ -12,7 +12,7 @@
     </php>
     <testsuites>
         <testsuite>
-            <directory>./src/Generator/Tests</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
